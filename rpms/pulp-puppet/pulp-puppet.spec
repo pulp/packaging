@@ -80,7 +80,6 @@ install -pm644 pulp_puppet_handlers/etc/pulp/agent/conf.d/* \
 Summary:	The Pulp Puppet admin client extensions
 Requires:	pulp-admin-client = %{required_pulp_version}
 Requires:	python2-pulp-puppet-common = %{version}
-Requires:	python2-setuptools
 
 
 %description admin-extensions
@@ -101,7 +100,6 @@ client capabilities with Puppet specific features.
 Summary:	The Pulp Puppet consumer client extensions
 Requires:	pulp-consumer-client = %{required_pulp_version}
 Requires:	python2-pulp-puppet-common = %{version}
-Requires:	python2-setuptools
 
 
 %description consumer-extensions
@@ -177,7 +175,6 @@ Summary:	Pulp Puppet Plugins
 Requires:	python2-pulp-puppet-common = %{version}
 Requires:	pulp-server = %{required_pulp_version}
 Requires:	python-semantic_version >= 2.2.0
-Requires:	python2-setuptools
 Requires:	python-pycurl
 
 
@@ -220,7 +217,6 @@ A collection of tools used to manage puppet modules.
 # ---- Common
 %package -n python2-pulp-puppet-common
 Summary:	Pulp Puppet support common library
-Requires:	python2-setuptools
 Requires:	python2-pulp-common >= %{required_pulp_version}
 %{?python_provide:%python_provide python2-pulp-docker-common}
 
