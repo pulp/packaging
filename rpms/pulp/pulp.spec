@@ -13,7 +13,7 @@ Release: 1%{?dist}
 BuildArch: noarch
 
 Summary: An application for managing software repositories
-License: GPLv2
+License: GPLv2+
 URL: https://github.com/pulp/pulp
 Source0: https://github.com/pulp/pulp/archive/pulp-%{version}-1.tar.gz
 
