@@ -118,7 +118,6 @@ to provide Docker specific support
 %package -n python2-pulp-docker-common
 Summary: Pulp Docker support common library
 Requires: python2-pulp-common >= %{required_pulp_version}
-Requires: python2-setuptools
 %{?python_provide:%python_provide python2-pulp-docker-common}
 
 

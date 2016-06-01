@@ -60,7 +60,6 @@ install -pm644 plugins/etc/httpd/conf.d/pulp_python.conf %{buildroot}/%{_sysconf
 Summary: The Python admin client extensions
 Requires: python-pulp-python-common = %{version}
 Requires: pulp-admin-client >= %{pulp_version}
-Requires: python-setuptools
 
 
 %description admin-extensions
@@ -95,7 +94,6 @@ Documentation for the Pulp Python plugins.
 Summary: Pulp Python plugins
 Requires: python-pulp-python-common >= %{version}
 Requires: pulp-server >= %{pulp_version}
-Requires: python-setuptools
 
 
 %description plugins
@@ -116,7 +114,6 @@ to provide Python package support.
 %package -n python-pulp-python-common
 Summary: Pulp Python support common library
 Requires: python-pulp-common >= %{pulp_version}
-Requires: python-setuptools
 
 
 %description -n python-pulp-python-common
