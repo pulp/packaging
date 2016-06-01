@@ -23,7 +23,7 @@ BuildRequires: plantuml
 BuildRequires: python2-devel
 BuildRequires: python2-setuptools
 BuildRequires: python2-rpm-macros
-BuildRequires: python2-sphinx >= 1.0.8
+BuildRequires: python-sphinx >= 1.0.8
 BuildRequires: selinux-policy-devel
 BuildRequires: systemd
 

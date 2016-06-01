@@ -14,7 +14,7 @@ BuildArch: noarch
 
 BuildRequires:  python2-devel
 BuildRequires:  python2-setuptools
-BuildRequires:  python2-sphinx
+BuildRequires:  python-sphinx
 
 
 %description
@@ -76,15 +76,15 @@ client capabilities with Python specific features.
 
 
 # ---- Documentation-----------------------------------------------------
-%package doc 
+%package doc
 Summary: Pulp Python documentation
 
 
-%description doc 
+%description doc
 Documentation for the Pulp Python plugins.
 
 
-%files doc 
+%files doc
 %license LICENSE
 %doc AUTHORS COPYRIGHT
 %doc docs/_build/html/*

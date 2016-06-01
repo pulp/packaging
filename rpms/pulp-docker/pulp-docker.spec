@@ -13,7 +13,7 @@ BuildArch: noarch
 BuildRequires: python2-devel
 BuildRequires: python2-rpm-macros
 BuildRequires: python2-setuptools
-BuildRequires: python2-sphinx
+BuildRequires: python-sphinx
 
 
 %description
@@ -76,15 +76,15 @@ pulp-admin extensions for Docker support
 
 
 # ---- Docker Documentation-----------------------------------------------------
-%package doc 
+%package doc
 Summary: Pulp Docker documentation
 
 
-%description doc 
+%description doc
 Documentation for the Pulp Docker plugins.
 
 
-%files doc 
+%files doc
 %license LICENSE
 %doc AUTHORS COPYRIGHT
 %doc docs/_build/html/*
@@ -95,7 +95,7 @@ Documentation for the Pulp Docker plugins.
 Summary: Pulp Docker plugins
 Requires: pulp-server >= %{required_pulp_version}
 Requires: python-nectar >= 1.3.0
-Requires: python2-pulp-docker-common = %{version} 
+Requires: python2-pulp-docker-common = %{version}
 
 
 %description plugins

@@ -15,7 +15,7 @@ BuildRequires:  python-rpm-macros
 BuildRequires:  python2-rpm-macros
 BuildRequires:  python2-devel
 BuildRequires:  python2-setuptools
-BuildRequires:  python2-sphinx
+BuildRequires:  python-sphinx
 
 
 %description
@@ -133,15 +133,15 @@ A collection of development utilities useful for developing pulp-rpm.
 
 
 # ---- Documentation ----------------------------------------------------------
-%package doc 
+%package doc
 Summary: Pulp RPM documentation
 
 
-%description doc 
+%description doc
 Documentation for the Pulp RPM plugins.
 
 
-%files doc 
+%files doc
 %license COPYRIGHT LICENSE
 %doc AUTHORS
 %doc docs/_build/html/*
