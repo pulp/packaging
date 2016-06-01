@@ -13,7 +13,7 @@ BuildArch:	noarch
 
 BuildRequires:	python2-devel
 BuildRequires:	python2-setuptools
-BuildRequires:	python2-sphinx
+BuildRequires:	python-sphinx
 
 
 %description
