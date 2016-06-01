@@ -8,8 +8,9 @@ Release:        2%{?dist}
 License:        LGPLv2+
 Summary:        Low-level AMQP client for Python (fork of amqplib)
 Group:          Development/Languages
-URL:            https://pypi.python.org/pypi/amqp
-Source0:        https://pypi.python.org/packages/source/a/%{srcname}/%{srcname}-%{version}.tar.gz
+URL:            https://github.com/celery/py-amqp
+Source0:        https://github.com/celery/py-amqp/archive/v%{version}.tar.gz
+
 BuildArch:      noarch
 
 BuildRequires:  python2-devel
@@ -27,7 +28,7 @@ This library should be API compatible with librabbitmq.
 
 
 %prep
-%setup -q -n %{srcname}-%{version}
+%setup -q -n py-%{srcname}-%{version}
 
 
 %build
