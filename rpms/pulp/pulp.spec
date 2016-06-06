@@ -547,8 +547,8 @@ Requires: python-qpid
 Requires: python-semantic_version >= 2.2.0
 Requires: python2-%{name}-common = %{version}
 Requires: python2-%{name}-repoauth = %{version}
-Requires: python2-mongoengine >= 0.10.0
-Requires: python2-oauth2 >= 1.5.211
+Requires: python-mongoengine >= 0.10.0
+Requires: python-oauth2 >= 1.5.211
 Requires: python2-pymongo >= 3.0.0
 Requires: python2-setuptools
 Requires(post): systemd
@@ -688,7 +688,7 @@ for content, bind and system specific operations.
 %package -n python2-pulp-bindings
 Summary: Pulp REST bindings for python
 Requires: m2crypto
-Requires: python2-oauth2 >= 1.5.170-2.pulp
+Requires: python-oauth2 >= 1.5.170-2.pulp
 Requires: python2-%{name}-common = %{version}
 %{?python_provide:%python_provide python2-pulp-bindings}
 
@@ -824,7 +824,7 @@ Summary: The pulp lazy streamer
 Requires: httpd
 Requires: pulp-server >= %{version}
 Requires: python-twisted
-Requires: python2-mongoengine
+Requires: python-mongoengine
 Requires(preun): systemd
 Requires(postun): systemd
 %{?python_provide:%python_provide python2-pulp-streamer}
