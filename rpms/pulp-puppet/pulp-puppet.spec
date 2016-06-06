@@ -1,8 +1,8 @@
-%global required_pulp_version 2.8.2
+%global required_pulp_version 2.8.4
 
 
 Name:		pulp-puppet
-Version:	2.8.2
+Version:	2.8.4
 Release:	1%{?dist}
 
 License:	GPLv2+
@@ -200,6 +200,7 @@ to provide Puppet specific support.
 Summary:	Pulp Puppet tools
 Requires:	puppet >= 2.7
 Requires:	git >= 1.7
+Requires:   python2-pulp-puppet-common = %{required_pulp_version}
 
 
 %description tools
@@ -218,7 +219,7 @@ A collection of tools used to manage puppet modules.
 %package -n python2-pulp-puppet-common
 Summary:	Pulp Puppet support common library
 Requires:	python2-pulp-common >= %{required_pulp_version}
-%{?python_provide:%python_provide python2-pulp-docker-common}
+%{?python_provide:%python_provide python2-pulp-puppet-common}
 
 
 %description -n python2-pulp-puppet-common
@@ -237,5 +238,10 @@ A collection of modules shared among all Puppet components.
 
 
 %changelog
+* Mon Jun 06 2016 Jeremy Cline <jcline@redhat.com> - 2.8.4-1
+- Bump version to 2.8.4
+- Fixed python2-pulp-puppet-common `provides` statement
+- tools sub-package now depends on python2-pulp-puppet-common
+
 * Mon May 09 2016 Randy Barlow <rbarlow@redhat.com> - 2.8.2-1
 - Initial import from Fedora 24.

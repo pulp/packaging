@@ -1,7 +1,7 @@
-%global required_pulp_version 2.8.0
+%global required_pulp_version 2.8
 
 Name: pulp-docker
-Version: 2.0.0
+Version: 2.0.1
 Release: 1%{?dist}
 
 License:   GPLv2+
@@ -137,5 +137,8 @@ Common libraries for python2-pulp-docker
 
 
 %changelog
+* Mon Jun 06 2016 Jeremy Cline <jcline@redhat.com> 2.0.1-1
+- Bump version to 2.0.1
+
 * Thu Mar 17 2016 Randy Barlow <rbarlow@redhat.com> 2.0.0-1
 - Initial import, taken from Fedora 24.

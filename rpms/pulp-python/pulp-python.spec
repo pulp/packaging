@@ -3,7 +3,7 @@
 
 
 Name: pulp-python
-Version: 1.1.0
+Version: 1.1.1
 Release: 1%{?dist}
 
 License:   GPLv2+
@@ -132,5 +132,8 @@ A collection of modules shared among all Pulp-Python components.
 
 
 %changelog
+* Mon Jun 06 2016 Jeremy Cline <jcline@redhat.com> 1.1.1-1
+- Bump version to 1.1.1
+
 * Mon May 09 2016 Randy Barlow <rbarlow@redhat.com> 1.1.0-1
 - Initial import from Fedora 24.

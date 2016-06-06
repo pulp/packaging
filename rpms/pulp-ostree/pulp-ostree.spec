@@ -1,8 +1,8 @@
-%global required_pulp_version 2.8.0
+%global required_pulp_version 2.8
 
 Name:		pulp-ostree
-Version:	1.1.0
-Release:	2%{?dist}
+Version:	1.1.1
+Release:	1%{?dist}
 
 License:	GPLv2+
 Summary:	Support for OSTree content in the Pulp platform
@@ -138,5 +138,8 @@ Common libraries for python2-pulp-ostree
 
 
 %changelog
+* Mon Jun 06 2016 Jeremy Cline <jcline@redhat.com> - 1.1.1-1
+- Bump version to 1.1.1
+
 * Mon May 09 2016 Randy Barlow <rbarlow@redhat.com> - 1.1.0-2
 - Initial import from Fedora 24.

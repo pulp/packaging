@@ -8,7 +8,7 @@
 
 
 Name: pulp
-Version: 2.8.2
+Version: 2.8.4
 Release: 1%{?dist}
 BuildArch: noarch
 
@@ -18,6 +18,7 @@ URL: https://github.com/pulp/pulp
 Source0: https://github.com/pulp/pulp/archive/pulp-%{version}-1.tar.gz
 
 BuildRequires: checkpolicy
+BuildRequires: graphviz
 BuildRequires: hardlink
 BuildRequires: plantuml
 BuildRequires: python2-devel
@@ -59,7 +60,8 @@ cd -
 
 # Build docs.
 pushd docs
-make %{?_smp_mflags} html
+# Uncomment this after 2.8.4. HTML builds broke for that release.
+# make %{?_smp_mflags} html
 make %{?_smp_mflags} man
 popd
 
@@ -339,7 +341,8 @@ Documentation for the Pulp project.
 
 %files doc
 %license LICENSE
-%doc docs/_build/html/*
+# Uncomment in 2.8.5+
+# %doc docs/_build/html/*
 
 
 # ---- Nodes Admin Extensions ------------------------------------------------------
@@ -862,5 +865,10 @@ fi
 
 
 %changelog
+* Mon Jun 06 2016 Jeremy Cline <jcline@redhat.com> - 2.8.4-1
+- Bump version to 2.8.4
+- Add build dependency on graphviz
+- Temporarily disable HTML documentation. It should return in 2.8.5
+
 * Mon May 09 2016 Randy Barlow <rbarlow@redhat.com> - 2.8.2-1
 - Initial import, taken from Fedora 24.

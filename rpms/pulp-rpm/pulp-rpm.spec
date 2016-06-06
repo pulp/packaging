@@ -1,8 +1,8 @@
 # define required pulp platform version.
-%global pulp_version 2.8.2
+%global pulp_version 2.8.4
 
 Name: pulp-rpm
-Version: 2.8.2
+Version: 2.8.4
 Release: 1%{?dist}
 
 License:   GPLv2+
@@ -251,5 +251,8 @@ A collection of modules shared among all RPM components.
 
 
 %changelog
+* Mon Jun 06 2016 Jeremy Cline <jcline@redhat.com> 2.8.4-1
+- Bump version to 2.8.4
+
 * Mon May 09 2016 Randy Barlow <rbarlow@redhat.com> 2.8.2-1
 - Initial import from Fedora 24.
