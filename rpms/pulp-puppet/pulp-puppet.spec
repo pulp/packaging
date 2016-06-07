@@ -12,7 +12,7 @@ Source0:	https://github.com/pulp/pulp_puppet/archive/%{name}-%{version}-1.tar.gz
 BuildArch:	noarch
 
 BuildRequires:	python2-devel
-BuildRequires:	python2-setuptools
+BuildRequires:	python-setuptools
 BuildRequires:	python-sphinx
 
 

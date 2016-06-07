@@ -3,7 +3,7 @@
 
 Name:           python-%{srcname}
 Version:        0.10.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 BuildArch:      noarch
 
 License:        MIT
@@ -13,7 +13,7 @@ URL:            https://github.com/MongoEngine/mongoengine
 Source0:        https://github.com/MongoEngine/mongoengine/archive/v%{version}.tar.gz
 
 BuildRequires:  python2-devel
-BuildRequires:  python2-setuptools
+BuildRequires:  python-setuptools
 
 Requires:       python-blinker
 Requires:       python-pymongo >= 3.2
@@ -43,6 +43,9 @@ MongoEngine is an ORM-like layer on top of PyMongo.
 
 
 %changelog
+* Tue Jun 07 2016 Jeremy Cline <jcline@redhat.com> - 0.10.5-3
+- Fix dependencies for EL7
+
 * Tue May 10 2016 Randy Barlow <rbarlow@redhat.com> - 0.10.5-2
 - Remove conditionals.
 - Use new Python and license macros.

@@ -14,7 +14,7 @@ BuildArch: noarch
 BuildRequires:  python-rpm-macros
 BuildRequires:  python2-rpm-macros
 BuildRequires:  python2-devel
-BuildRequires:  python2-setuptools
+BuildRequires:  python-setuptools
 BuildRequires:  python-sphinx
 
 
@@ -150,10 +150,10 @@ Documentation for the Pulp RPM plugins.
 # ---- Agent Handlers ----------------------------------------------------------
 %package handlers
 Summary: Pulp agent rpm handlers
-Requires: fedora-repos
 Requires: python-rhsm
 Requires: python-pulp-agent-lib = %{pulp_version}
 Requires: python-pulp-rpm-common = %{version}
+Requires: yum
 
 
 %description handlers

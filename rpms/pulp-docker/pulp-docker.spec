@@ -12,7 +12,7 @@ BuildArch: noarch
 
 BuildRequires: python2-devel
 BuildRequires: python2-rpm-macros
-BuildRequires: python2-setuptools
+BuildRequires: python-setuptools
 BuildRequires: python-sphinx
 
 

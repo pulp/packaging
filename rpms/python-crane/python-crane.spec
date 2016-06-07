@@ -16,7 +16,7 @@ Source0:   https://github.com/pulp/crane/archive/python-crane-%{version}-1.tar.g
 BuildArch: noarch
 
 BuildRequires: python2-devel
-BuildRequires: python2-setuptools
+BuildRequires: python-setuptools
 
 
 %description
@@ -27,7 +27,7 @@ BuildRequires: python2-setuptools
 Summary: %{sum}
 Requires: python-flask >= 0.9
 Requires: python-rhsm
-Requires: python2-setuptools
+Requires: python-setuptools
 Requires(post): policycoreutils-python
 Requires(postun): policycoreutils-python
 

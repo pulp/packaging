@@ -18,11 +18,9 @@ URL: https://github.com/pulp/pulp
 Source0: https://github.com/pulp/pulp/archive/pulp-%{version}-1.tar.gz
 
 BuildRequires: checkpolicy
-BuildRequires: graphviz
 BuildRequires: hardlink
-BuildRequires: plantuml
 BuildRequires: python2-devel
-BuildRequires: python2-setuptools
+BuildRequires: python-setuptools
 BuildRequires: python2-rpm-macros
 BuildRequires: python-sphinx >= 1.0.8
 BuildRequires: selinux-policy-devel
@@ -58,10 +56,9 @@ sed -i "s/policy_module(pulp-streamer, [0-9]*.[0-9]*.[0-9]*)/policy_module(pulp-
 ./build.sh ${distver}
 cd -
 
-# Build docs.
+# Build docs; note that HTML docs can't be built because plantuml
+# is unavailable on el7. As such, there is no docs subpackage.
 pushd docs
-# Uncomment this after 2.8.4. HTML builds broke for that release.
-# make %{?_smp_mflags} html
 make %{?_smp_mflags} man
 popd
 
@@ -330,21 +327,6 @@ fi
 chmod 640 $KEY_PATH
 
 
-# Documentation
-%package doc
-Summary: Pulp documentation
-
-
-%description doc
-Documentation for the Pulp project.
-
-
-%files doc
-%license LICENSE
-# Uncomment in 2.8.5+
-# %doc docs/_build/html/*
-
-
 # ---- Nodes Admin Extensions ------------------------------------------------------
 %package nodes-admin-extensions
 Summary: Pulp admin client extensions
@@ -529,7 +511,6 @@ Requires: crontabs
 Requires: genisoimage
 Requires: glibc-common
 Requires: httpd
-Requires: httpd-filesystem
 Requires: m2crypto
 Requires: mod_ssl
 Requires: mod_wsgi >= 3.4-1.pulp
@@ -553,7 +534,7 @@ Requires: python2-%{name}-repoauth = %{version}
 Requires: python-mongoengine >= 0.10.0
 Requires: python-oauth2 >= 1.5.211
 Requires: python2-pymongo >= 3.0.0
-Requires: python2-setuptools
+Requires: python-setuptools
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
@@ -714,7 +695,7 @@ Requires: m2crypto
 Requires: python-isodate >= 0.5.0-1
 Requires: python-okaara >= 1.0.32
 Requires: python2-%{name}-common = %{version}
-Requires: python2-setuptools
+Requires: python-setuptools
 %{?python_provide:%python_provide python2-client-lib}
 
 
@@ -805,7 +786,7 @@ Requires: mod_wsgi >= 3.4-1.pulp
 Requires: openssl
 Requires: python-rhsm
 Requires: python2-%{name}-common = %{version}
-Requires: python2-setuptools
+Requires: python-setuptools
 %{?python_provide:%python_provide python2-pulp-repoauth}
 
 
@@ -826,7 +807,8 @@ Cert-based repository authentication for Pulp
 Summary: The pulp lazy streamer
 Requires: httpd
 Requires: pulp-server >= %{version}
-Requires: python-twisted
+Requires: python-twisted-core
+Requires: python-twisted-web
 Requires: python-mongoengine
 Requires(preun): systemd
 Requires(postun): systemd
@@ -867,8 +849,7 @@ fi
 %changelog
 * Mon Jun 06 2016 Jeremy Cline <jcline@redhat.com> - 2.8.4-1
 - Bump version to 2.8.4
-- Add build dependency on graphviz
-- Temporarily disable HTML documentation. It should return in 2.8.5
+- Stop building the doc subpackage as its build deps are unavailable
 
 * Mon May 09 2016 Randy Barlow <rbarlow@redhat.com> - 2.8.2-1
 - Initial import, taken from Fedora 24.

@@ -6,7 +6,7 @@
 
 Name:           python-pymongo
 Version:        3.2.2
-Release:        2%{?dist}
+Release:        3%{?dist}
 
 # All code is ASL 2.0 except bson/time64*.{c,h} which is MIT
 License:        ASL 2.0 and MIT
@@ -22,10 +22,8 @@ Patch02:        0002-Use-ssl.match_hostname-from-the-Python-stdlib.patch
 BuildRequires:  python-nose
 BuildRequires:  python-sphinx
 BuildRequires:  python-tools
-BuildRequires:  python2-devel
-BuildRequires:  python2-setuptools
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
+BuildRequires:  python-devel
+BuildRequires:  python-setuptools
 
 # Mongodb must run on a little-endian CPU (see bug #630898)
 ExcludeArch:    ppc ppc64 %{sparc} s390 s390x
@@ -33,14 +31,6 @@ ExcludeArch:    ppc ppc64 %{sparc} s390 s390x
 
 %description
 The Python driver for MongoDB.
-
-
-%package doc
-Summary: Documentation for python-pymongo
-
-
-%description doc
-Documentation for python-pymongo.
 
 
 %package -n python2-bson
@@ -52,18 +42,6 @@ Summary:        Python bson library
 BSON is a binary-encoded serialization of JSON-like documents. BSON is designed
 to be lightweight, traversable, and efficient. BSON, like JSON, supports the
 embedding of objects and arrays within other objects and arrays.
-
-
-%package -n python3-bson
-Summary:        Python bson library
-%{?python_provide:%python_provide python3-bson}
-
-
-%description -n python3-bson
-BSON is a binary-encoded serialization of JSON-like documents. BSON is designed
-to be lightweight, traversable, and efficient. BSON, like JSON, supports the
-embedding of objects and arrays within other objects and arrays.  This package
-contains the python3 version of this module.
 
 
 %package -n python2-pymongo
@@ -80,17 +58,6 @@ The Python driver for MongoDB.  This package contains the python2 version of
 this module.
 
 
-%package -n python3-pymongo
-Summary:        Python driver for MongoDB
-Requires:       python3-bson = %{version}-%{release}
-%{?python_provide:%python_provide python3-pymongo}
-
-
-%description -n python3-pymongo
-The Python driver for MongoDB.  This package contains the python3 version of
-this module.
-
-
 %package -n python2-pymongo-gridfs
 Summary:        Python GridFS driver for MongoDB
 Requires:       %{name}%{?_isa} = %{version}-%{release}
@@ -103,36 +70,14 @@ Obsoletes:      pymongo-gridfs <= 2.1.1-4
 GridFS is a storage specification for large objects in MongoDB.
 
 
-%package -n python3-pymongo-gridfs
-Summary:        Python GridFS driver for MongoDB
-Requires:       python3-pymongo%{?_isa} = %{version}-%{release}
-%{?python_provide:%python_provide python3-pymongo-gridfs}
-
-
-%description -n python3-pymongo-gridfs
-GridFS is a storage specification for large objects in MongoDB.  This package
-contains the python3 version of this module.
-
-
 %prep
 %setup -q -n mongo-python-driver-%{version}
 %patch01 -p1 -b .test
 %patch02 -p1 -b .ssl
 
-rm -rf %{py3dir}
-cp -a . %{py3dir}
-
 
 %build
 CFLAGS="%{optflags}" %{__python2} setup.py build
-
-pushd %{py3dir}
-CFLAGS="%{optflags}" %{__python3} setup.py build
-popd
-
-pushd doc
-make html
-popd
 
 
 %install
@@ -142,29 +87,11 @@ rm -rf %{buildroot}
 chmod 755 %{buildroot}%{python2_sitearch}/bson/*.so
 chmod 755 %{buildroot}%{python2_sitearch}/pymongo/*.so
 
-pushd %{py3dir}
-%{__python3} setup.py install --skip-build --root $RPM_BUILD_ROOT
-# Fix permissions
-chmod 755 %{buildroot}%{python3_sitearch}/bson/*.so
-chmod 755 %{buildroot}%{python3_sitearch}/pymongo/*.so
-popd
-
-
-%files doc
-%license LICENSE
-%doc doc/_build/html/*
-
 
 %files -n python2-bson
 %license LICENSE
 %doc README.rst
 %{python2_sitearch}/bson
-
-
-%files -n python3-bson
-%license LICENSE
-%doc README.rst
-%{python3_sitearch}/bson
 
 
 %files -n python2-pymongo
@@ -174,23 +101,10 @@ popd
 %{python2_sitearch}/pymongo-%{version}-*.egg-info
 
 
-%files -n python3-pymongo
-%license LICENSE
-%doc README.rst
-%{python3_sitearch}/pymongo
-%{python3_sitearch}/pymongo-%{version}-*.egg-info
-
-
 %files -n python2-pymongo-gridfs
 %license LICENSE
 %doc README.rst
 %{python2_sitearch}/gridfs
-
-
-%files -n python3-pymongo-gridfs
-%license LICENSE
-%doc README.rst
-%{python3_sitearch}/gridfs
 
 
 %check
@@ -278,6 +192,11 @@ popd
 
 
 %changelog
+* Tue Jun 07 2016 Jeremy Cline <jcline@redhat.com> - 3.2.2-3
+- Drop Python 3 packages
+- Drop HTML documentation as it fails to build on EL7
+- Fix dependency names for EL7
+
 * Wed May 11 2016 Randy Barlow <rbarlow@redhat.com> - 3.2.2-2
 - Depend on python-sphinx instead of python2-sphinx.
 
