@@ -1,0 +1,154 @@
+From ceb275ef3c63d4324e05539242283de083bd08d6 Mon Sep 17 00:00:00 2001
+From: Randy Barlow <randy@electronsweatshop.com>
+Date: Wed, 3 Feb 2016 22:10:28 -0500
+Subject: [PATCH] Use ssl.match_hostname from the Python stdlib.
+
+---
+ pymongo/errors.py             |   5 +--
+ pymongo/pool.py               |   6 +--
+ pymongo/ssl_match_hostname.py | 100 ------------------------------------------
+ 3 files changed, 2 insertions(+), 109 deletions(-)
+ delete mode 100644 pymongo/ssl_match_hostname.py
+
+diff --git a/pymongo/errors.py b/pymongo/errors.py
+index fe7b71a..0ba6006 100644
+--- a/pymongo/errors.py
++++ b/pymongo/errors.py
+@@ -16,10 +16,7 @@
+ 
+ from bson.errors import *
+ 
+-try:
+-    from ssl import CertificateError
+-except ImportError:
+-    from pymongo.ssl_match_hostname import CertificateError
++from ssl import CertificateError
+ 
+ 
+ class PyMongoError(Exception):
+diff --git a/pymongo/pool.py b/pymongo/pool.py
+index 904c6b1..5fe663c 100644
+--- a/pymongo/pool.py
++++ b/pymongo/pool.py
+@@ -44,11 +44,7 @@ from pymongo.server_type import SERVER_TYPE
+ # main thread, to avoid the deadlock. See PYTHON-607.
+ u('foo').encode('idna')
+ 
+-try:
+-    from ssl import match_hostname, CertificateError
+-except ImportError:
+-    # These don't require the ssl module
+-    from pymongo.ssl_match_hostname import match_hostname, CertificateError
++from ssl import match_hostname, CertificateError
+ 
+ 
+ def _raise_connection_failure(address, error):
+diff --git a/pymongo/ssl_match_hostname.py b/pymongo/ssl_match_hostname.py
+deleted file mode 100644
+index f74df15..0000000
+--- a/pymongo/ssl_match_hostname.py
++++ /dev/null
+@@ -1,100 +0,0 @@
+-# Backport of the match_hostname logic introduced in python 3.2
+-# http://hg.python.org/releasing/3.3.5/file/993955b807b3/Lib/ssl.py
+-
+-import re
+-
+-
+-class CertificateError(ValueError):
+-    pass
+-
+-
+-def _dnsname_match(dn, hostname, max_wildcards=1):
+-    """Matching according to RFC 6125, section 6.4.3
+-
+-    http://tools.ietf.org/html/rfc6125#section-6.4.3
+-    """
+-    pats = []
+-    if not dn:
+-        return False
+-
+-    parts = dn.split(r'.')
+-    leftmost = parts[0]
+-    remainder = parts[1:]
+-
+-    wildcards = leftmost.count('*')
+-    if wildcards > max_wildcards:
+-        # Issue #17980: avoid denials of service by refusing more
+-        # than one wildcard per fragment.  A survey of established
+-        # policy among SSL implementations showed it to be a
+-        # reasonable choice.
+-        raise CertificateError(
+-            "too many wildcards in certificate DNS name: " + repr(dn))
+-
+-    # speed up common case w/o wildcards
+-    if not wildcards:
+-        return dn.lower() == hostname.lower()
+-
+-    # RFC 6125, section 6.4.3, subitem 1.
+-    # The client SHOULD NOT attempt to match a presented identifier in which
+-    # the wildcard character comprises a label other than the left-most label.
+-    if leftmost == '*':
+-        # When '*' is a fragment by itself, it matches a non-empty dotless
+-        # fragment.
+-        pats.append('[^.]+')
+-    elif leftmost.startswith('xn--') or hostname.startswith('xn--'):
+-        # RFC 6125, section 6.4.3, subitem 3.
+-        # The client SHOULD NOT attempt to match a presented identifier
+-        # where the wildcard character is embedded within an A-label or
+-        # U-label of an internationalized domain name.
+-        pats.append(re.escape(leftmost))
+-    else:
+-        # Otherwise, '*' matches any dotless string, e.g. www*
+-        pats.append(re.escape(leftmost).replace(r'\*', '[^.]*'))
+-
+-    # add the remaining fragments, ignore any wildcards
+-    for frag in remainder:
+-        pats.append(re.escape(frag))
+-
+-    pat = re.compile(r'\A' + r'\.'.join(pats) + r'\Z', re.IGNORECASE)
+-    return pat.match(hostname)
+-
+-
+-def match_hostname(cert, hostname):
+-    """Verify that *cert* (in decoded format as returned by
+-    SSLSocket.getpeercert()) matches the *hostname*.  RFC 2818 and RFC 6125
+-    rules are followed, but IP addresses are not accepted for *hostname*.
+-
+-    CertificateError is raised on failure. On success, the function
+-    returns nothing.
+-    """
+-    if not cert:
+-        raise ValueError("empty or no certificate")
+-    dnsnames = []
+-    san = cert.get('subjectAltName', ())
+-    for key, value in san:
+-        if key == 'DNS':
+-            if _dnsname_match(value, hostname):
+-                return
+-            dnsnames.append(value)
+-    if not dnsnames:
+-        # The subject is only checked when there is no dNSName entry
+-        # in subjectAltName
+-        for sub in cert.get('subject', ()):
+-            for key, value in sub:
+-                # XXX according to RFC 2818, the most specific Common Name
+-                # must be used.
+-                if key == 'commonName':
+-                    if _dnsname_match(value, hostname):
+-                        return
+-                    dnsnames.append(value)
+-    if len(dnsnames) > 1:
+-        raise CertificateError("hostname %r "
+-            "doesn't match either of %s"
+-            % (hostname, ', '.join(map(repr, dnsnames))))
+-    elif len(dnsnames) == 1:
+-        raise CertificateError("hostname %r "
+-            "doesn't match %r"
+-            % (hostname, dnsnames[0]))
+-    else:
+-        raise CertificateError("no appropriate commonName or "
+-            "subjectAltName fields were found")
+-- 
+2.7.0
+

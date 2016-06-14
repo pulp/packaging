@@ -1,3 +1,8 @@
-*.pyc
-ci/nodepool/scripts/id_rsa.pub
-ci/nodepool/scripts/rhel*-rcm-internal.repo
+# Build artifacts
+*.rpm
+*.log
+*.tar.gz
+
+# Build dirs
+RPMS/
+SRPMS/
