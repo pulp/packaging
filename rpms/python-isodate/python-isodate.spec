@@ -37,7 +37,8 @@ fractional seconds are limited to microseconds. That means if the parser finds
 for instance nanoseconds it will round it to microseconds.
 
 %prep
-%autosetup -p1 -n isodate-%{version}
+%setup -q -n isodate-%{version}
+%patch0 -p1
 
 %build
 %{__python} setup.py build

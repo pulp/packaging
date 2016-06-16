@@ -32,7 +32,7 @@ handlers that provide RPM support.
 
 
 %prep
-%autosetup -n pulp_rpm-%{name}-%{version}-1
+%setup -q -n pulp_rpm-%{name}-%{version}-1
 
 
 %build

@@ -1,0 +1,292 @@
+From 360e88ef5bb8e1279cd88ef1241f01e8a143d3cf Mon Sep 17 00:00:00 2001
+From: Kenneth Anthony Giusti <kgiusti@apache.org>
+Date: Thu, 23 May 2013 14:39:10 +0000
+Subject: [PATCH 1/5] Bug 966004,QPID-4882: use correct exception object for
+ older ssl implementations
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/trunk@1485741 13f79535-47bb-0310-9956-ffa450edef68
+---
+ qpid/python/qpid/messaging/transports.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/qpid/python/qpid/messaging/transports.py b/qpid/python/qpid/messaging/transports.py
+index c76db1f..da40afe 100644
+--- a/qpid/python/qpid/messaging/transports.py
++++ b/qpid/python/qpid/messaging/transports.py
+@@ -76,7 +76,7 @@ except ImportError:
+       # supplied CA certs. Since this version cannot validate, the peer cannot
+       # be trusted.
+       if conn.ssl_trustfile:
+-        raise SSLError("This version of Python does not support verification of the peer's certificate.")
++        raise socket.error("This version of Python does not support verification of the peer's certificate.")
+ 
+       self.ssl = ssl(self.socket, keyfile=ssl_keyfile, certfile=ssl_certfile)
+       self.socket.setblocking(1)
+-- 
+1.7.11.7
+
+From 560f21d648285d1bb5b7cf73fe66ee782ceefd27 Mon Sep 17 00:00:00 2001
+From: Gordon Sim <gsim@apache.org>
+Date: Thu, 6 Jun 2013 11:30:16 +0000
+Subject: [PATCH 2/5] Bug 1041575,QPID-4903: don't delete subscription queue
+ when closing link if it was explicitly declared
+ non-exclusive
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/trunk/qpid@1490240 13f79535-47bb-0310-9956-ffa450edef68
+---
+ qpid/python/qpid/messaging/driver.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/qpid/python/qpid/messaging/driver.py b/qpid/python/qpid/messaging/driver.py
+index 3cb62d7..a543d98 100644
+--- a/qpid/python/qpid/messaging/driver.py
++++ b/qpid/python/qpid/messaging/driver.py
+@@ -247,7 +247,7 @@ class LinkIn:
+                                  exclusive=True,
+                                  auto_delete=(reliability == "unreliable")),
+                     overrides=declare)
+-      _rcv.on_unlink = [QueueDelete(_rcv._queue)]
++      if declare.get("exclusive", True): _rcv.on_unlink = [QueueDelete(_rcv._queue)]
+       subject = _rcv.subject or SUBJECT_DEFAULTS.get(subtype)
+       bindings = get_bindings(link_opts, _rcv._queue, _rcv.name, subject)
+       if not bindings:
+-- 
+1.7.11.7
+
+From 90a7c86422daec2b29923474febdf13bdd04ddc8 Mon Sep 17 00:00:00 2001
+From: Alan Conway <aconway@redhat.com>
+Date: Fri, 3 Jan 2014 16:40:20 -0500
+Subject: [PATCH 3/5] Bug 1044002,QPID-5428: setting heartbeat has no effect
+ on connection establishment timeout
+
+Heartbeats ignored when opening a connection, could hang indefinitely
+Need to cover 3 cases (test included):
+- Connect sucessful but then broker stalls.
+- Connect to a stalled broker that never responds.
+- Fail-over to a stalled broker that never responds
+
+All cases are handled by the following fixes to driver.py:
+- Check for heartbeats even before engine._connected since we may time out
+  before receiving open-ok if the peer is stalled and never sends data.
+- Set _last_in and _last_out so that we time heartbeats from the start of the
+  connection if no data is ever sent or received.
+- Call self.update_status in Driver.timeout to detect connection closed due to
+  heartbeat timeout (rather than a readable or writeable event.)
+  Make update_status a no-op if engine or transport are not yet set up.
+- Don't consider reconnect complete in connect(), wait till we get the open-ok.
+  See the comment on Driver._check_retry_ok()
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/trunk@1556971 13f79535-47bb-0310-9956-ffa450edef68
+---
+ qpid/python/qpid/messaging/driver.py | 55 ++++++++++++++++++++++++------------
+ 1 file changed, 37 insertions(+), 18 deletions(-)
+
+diff --git a/qpid/python/qpid/messaging/driver.py b/qpid/python/qpid/messaging/driver.py
+index a543d98..317dce1 100644
+--- a/qpid/python/qpid/messaging/driver.py
++++ b/qpid/python/qpid/messaging/driver.py
+@@ -367,11 +367,11 @@ class Driver:
+         [(u.host, default(u.port, 5672)) for u in urls]
+     if self._host >= len(hosts):
+       self._host = 0
+-    result = hosts[self._host]
++    self._last_host = hosts[self._host]
+     if self._host == 0:
+       self._attempts += 1
+     self._host = self._host + 1
+-    return result
++    return self._last_host
+ 
+   def _num_hosts(self):
+     return len(self.connection.reconnect_urls) + 1
+@@ -406,6 +406,24 @@ class Driver:
+   def timing(self):
+     return self._timeout
+ 
++  def _check_retry_ok(self):
++    """We consider a reconnect to have suceeded only when we have received
++    open-ok from the peer.
++
++    If we declared success as soon as the transport connected, then we could get
++    into an infinite heartbeat loop if the remote process is hung and never
++    sends us any data. We would fail the connection after 2 missed heartbeats,
++    reconnect the transport, declare the reconnect ok, then fail again after 2
++    missed heartbeats and so on.
++    """
++    if self._retrying and self.engine._connected: # Means we have received open-ok.
++      if self._reconnect_log:
++        log.warn("reconnect succeeded: %s:%s", *self._last_host)
++      self._next_retry = None
++      self._attempts = 0
++      self._delay = self.connection.reconnect_interval_min
++      self._retrying = False
++
+   @synchronized
+   def readable(self):
+     try:
+@@ -415,6 +433,7 @@ class Driver:
+       elif data:
+         rawlog.debug("READ[%s]: %r", self.log_id, data)
+         self.engine.write(data)
++        self._check_retry_ok()
+       else:
+         self.close_engine()
+     except socket.error, e:
+@@ -456,13 +475,14 @@ class Driver:
+     self.schedule()
+ 
+   def update_status(self):
++    if not self.engine: return False
+     status = self.engine.status()
+     return getattr(self, "st_%s" % status.lower())()
+ 
+   def st_closed(self):
+     # XXX: this log statement seems to sometimes hit when the socket is not connected
+     # XXX: rawlog.debug("CLOSE[%s]: %s", self.log_id, self._socket.getpeername())
+-    self._transport.close()
++    if self._transport: self._transport.close()
+     self._transport = None
+     self.engine = None
+     return True
+@@ -488,6 +508,7 @@ class Driver:
+   @synchronized
+   def timeout(self):
+     self.dispatch()
++    self.update_status()
+     self._notify()
+     self.schedule()
+ 
+@@ -533,12 +554,6 @@ class Driver:
+         self._transport = trans(self.connection, host, port)
+       else:
+         raise ConnectError("no such transport: %s" % self.connection.transport)
+-      if self._retrying and self._reconnect_log:
+-        log.warn("reconnect succeeded: %s:%s", host, port)
+-      self._next_retry = None
+-      self._attempts = 0
+-      self._delay = self.connection.reconnect_interval_min
+-      self._retrying = False
+       self.schedule()
+     except socket.error, e:
+       self.close_engine(ConnectError(text=str(e)))
+@@ -591,8 +606,10 @@ class Engine:
+     self._status = CLOSED
+     self._buf = ""
+     self._hdr = ""
+-    self._last_in = None
+-    self._last_out = None
++    # Set _last_in and _last_out here so heartbeats will be timed from the
++    # beginning of connection if no data is sent/received.
++    self._last_in = time.time()
++    self._last_out = time.time()
+     self._op_enc = OpEncoder()
+     self._seg_enc = SegmentEncoder()
+     self._frame_enc = FrameEncoder()
+@@ -816,13 +833,15 @@ class Engine:
+         self.attach(ssn)
+         self.process(ssn)
+ 
+-      if self.connection.heartbeat and self._status != CLOSED:
+-        now = time.time()
+-        if self._last_in is not None and \
+-              now - self._last_in > 2*self.connection.heartbeat:
+-          raise HeartbeatTimeout(text="heartbeat timeout")
+-        if self._last_out is None or now - self._last_out >= self.connection.heartbeat/2.0:
+-          self.write_op(ConnectionHeartbeat())
++    # We need to check heartbeat even if not self._connected since we may have
++    # heartbeat timeout before receiving an open-ok
++    if self.connection.heartbeat and self._status != CLOSED and not self._closing:
++      now = time.time()
++      if now - self._last_in > 2*self.connection.heartbeat:
++        raise HeartbeatTimeout(text="heartbeat timeout")
++      # Only send heartbeats if we are connected.
++      if self._connected and now - self._last_out >= self.connection.heartbeat/2.0:
++        self.write_op(ConnectionHeartbeat())
+ 
+   def open(self):
+     self._reset()
+-- 
+1.7.11.7
+
+From 0af8a502b2c42e29662bbf6d1c48c633319a8e50 Mon Sep 17 00:00:00 2001
+From: Gordon Sim <gsim@apache.org>
+Date: Wed, 15 Jan 2014 18:41:06 +0000
+Subject: [PATCH 4/5] Bug 1053759,QPID-2294: handle signal interruptions to
+ select
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/trunk@1558503 13f79535-47bb-0310-9956-ffa450edef68
+---
+ qpid/python/qpid/compat.py | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
+
+diff --git a/qpid/python/qpid/compat.py b/qpid/python/qpid/compat.py
+index 8b1f4b7..ee3bf91 100644
+--- a/qpid/python/qpid/compat.py
++++ b/qpid/python/qpid/compat.py
+@@ -18,6 +18,8 @@
+ #
+ 
+ import sys
++import errno
++import time
+ 
+ try:
+   set = set
+@@ -42,6 +44,7 @@ if tuple(sys.version_info[0:2]) < (2, 4):
+     return old_select(list(rlist), list(wlist), list(xlist), timeout)
+ else:
+   from select import select
++  from select import error as SelectError
+ 
+ class BaseWaiter:
+ 
+@@ -49,8 +52,18 @@ class BaseWaiter:
+     self._do_write()
+ 
+   def wait(self, timeout=None):
++    start = time.time()
+     if timeout is not None:
+-      ready, _, _ = select([self], [], [], timeout)
++      while True:
++        try:
++          ready, _, _ = select([self], [], [], timeout)
++          break
++        except SelectError, e:
++          if e[0] == errno.EINTR:
++            elapsed = time.time() - start
++            timeout = timeout - elapsed
++          else:
++            raise e
+     else:
+       ready = True
+ 
+-- 
+1.7.11.7
+
+From 1de89949ae97628d10c7cfd8c001ec9041e7aa14 Mon Sep 17 00:00:00 2001
+From: Gordon Sim <gsim@apache.org>
+Date: Fri, 24 Jan 2014 12:38:13 +0000
+Subject: [PATCH 5/5] Bug 1053759,QPID-2294: add checks for negative timeout
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/trunk@1560974 13f79535-47bb-0310-9956-ffa450edef68
+---
+ qpid/python/qpid/compat.py | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/qpid/python/qpid/compat.py b/qpid/python/qpid/compat.py
+index ee3bf91..0753cb0 100644
+--- a/qpid/python/qpid/compat.py
++++ b/qpid/python/qpid/compat.py
+@@ -54,7 +54,8 @@ class BaseWaiter:
+   def wait(self, timeout=None):
+     start = time.time()
+     if timeout is not None:
+-      while True:
++      ready = False
++      while timeout > 0:
+         try:
+           ready, _, _ = select([self], [], [], timeout)
+           break
+-- 
+1.7.11.7
+

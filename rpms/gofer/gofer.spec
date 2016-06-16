@@ -36,7 +36,8 @@ AMQP message broker. Actions are also provided by plug-ins and are
 executed at the specified interval.
 
 %prep
-%autosetup -n %{name}-%{name}-%{version}-1
+%setup -q -n %{name}-%{name}-%{version}-1
+
 
 %build
 pushd src
@@ -139,7 +140,6 @@ Requires: python-ctypes
 Requires: python-simplejson
 Requires: python-hashlib
 Requires: python-uuid
-Requires: python-multiprocessing
 %endif
 
 %description -n python-%{name}
@@ -226,8 +226,8 @@ Requires: python-amqp >= 1.4.5
 Provides the gofer amqp messaging adapter package.
 
 %files -n python-%{name}-amqp
-%license LICENSE
 %{python_sitelib}/%{name}/messaging/adapter/amqp
+%doc LICENSE
 
 
 # --- changelog --------------------------------------------------------------

@@ -4,30 +4,18 @@
 SRPM_DIR=${PWD}/SRPMS/
 RPM_DIR=${PWD}/RPMS/
 SPECS_DIR=${PWD}/rpms/
-CHROOT=epel-6-x86_64
+DEFAULT_CHROOT=epel-5-x86_64
+CHROOTS = epel-5-x86_64 epel-5-i386
 
 # The important dependencies are:
 # 	python-kombu BuildRequires python-amqp
-BUILD_ORDER = python-amqp \
-			  python-billiard \
-			  python-kombu \
-			  python-celery \
-			  python-pymongo \
-			  python-mongoengine \
+BUILD_ORDER = gofer \
 			  pulp \
-			  pulp-docker \
-			  pulp-ostree \
 			  pulp-puppet \
-			  pulp-python \
 			  pulp-rpm \
-			  gofer \
-			  python-crane \
-			  python-nectar \
-			  mod_wsgi \
 			  python-isodate \
-			  python-rhsm \
-			  python-semantic_version
-
+			  python-qpid \
+			  saslwrapper
 
 all: help
 
@@ -35,9 +23,10 @@ all: help
 help:
 	@echo "Usage: make <target>"
 	@echo "Available targets are:"
-	@echo " srpm                    build srpms in the ${CHROOT} mock root"
-	@echo " copr-build              build rpms in COPR"
-	@echo " mock-build              build rpms in the ${CHROOT} mock root"
+	@echo " srpm                    build srpms in the ${DEFAULT_CHROOT} mock root"
+	@echo " copr-build              build rpms in COPR; defaults to building in the ${CHROOTS}"
+	@echo "                         chroots (define CHROOTS to override)"
+	@echo " mock-build              build rpms in the ${DEFAULT_CHROOT} mock root"
 	@echo " clean                   remove all build files"
 
 
@@ -48,7 +37,7 @@ srpm:
 	mkdir -p ${SRPM_DIR}
 	if [ $$(ls -l rpms | wc -l) -ne $$(ls -l SRPMS | wc -l) ]; then \
 		for p in $$(ls rpms); do \
-			scripts/build-srpm.sh ${CHROOT} $${p} || exit 1 ; \
+			scripts/build-srpm.sh ${DEFAULT_CHROOT} $${p} || exit 1 ; \
 		done; \
 		rm ${SRPM_DIR}*log; \
 	fi
@@ -62,19 +51,20 @@ mock-build: srpm
 	mkdir -p ${RPM_DIR}
 	for p in ${BUILD_ORDER}; do \
 		PACKAGE=$$(ls SRPMS/ | grep "$${p}-[0-9]"); \
-		mock -r ${CHROOT} -i ${RPM_DIR}/*rpm ; \
 		echo "Building $${PACKAGE}"; \
-		mock -r ${CHROOT} --no-clean --resultdir ${RPM_DIR} SRPMS/"$${PACKAGE}" || exit 1 ; \
+		mock -r ${DEFAULT_CHROOT} --no-clean --resultdir ${RPM_DIR} SRPMS/"$${PACKAGE}" || exit 1 ; \
 	done
 
 
 copr-build: srpm
 	# Specify variables with VARIABLE=value. For example:
 	# ``make copr-build PROJECT=2.8-nightly``
-	for p in ${BUILD_ORDER}; do \
-		PACKAGE=$$(ls SRPMS/ | grep "$${p}-[0-9]"); \
-		echo "Building $${PACKAGE}"; \
-		copr-cli build --nowait -r ${CHROOT} "@pulp/${PROJECT}" SRPMS/"$${PACKAGE}"; \
+	for c in ${CHROOTS} ; do \
+		for p in ${BUILD_ORDER}; do \
+			PACKAGE=$$(ls SRPMS/ | grep "$${p}-[0-9]"); \
+			echo "Building $${PACKAGE}"; \
+			copr-cli build --nowait -r $${c} "@pulp/${PROJECT}" SRPMS/"$${PACKAGE}"; \
+		done ; \
 	done
 
 

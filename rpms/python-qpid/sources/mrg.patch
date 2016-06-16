@@ -1,0 +1,413 @@
+From ddc97b687231dccb07b2f0017c962ab90d28cd3c Mon Sep 17 00:00:00 2001
+From: Ted Ross <tross@apache.org>
+Date: Thu, 26 Jul 2012 14:38:53 +0000
+Subject: [PATCH 1/5] Bug 825078 - qpid-tools no longer works with SSL
+ QPID-3175 - Added SSL/x.509-auth capability to Python clients and Python tools
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/trunk@1366020 13f79535-47bb-0310-9956-ffa450edef68
+(cherry picked from commit 636830f7161ee1bc772e7d96716cdb3264002cb7)
+---
+ qpid/python/qpid/connection.py |    5 ++-
+ qpid/python/qpid/delegates.py  |   67 +++++++++++++++-------------------------
+ qpid/python/qpid/framer.py     |   14 +++++---
+ qpid/python/qpid/sasl.py       |    3 ++
+ qpid/python/qpid/util.py       |    4 +-
+ 5 files changed, 41 insertions(+), 52 deletions(-)
+
+diff --git a/qpid/python/qpid/connection.py b/qpid/python/qpid/connection.py
+index 66e1cb4..2453f38 100644
+--- a/qpid/python/qpid/connection.py
++++ b/qpid/python/qpid/connection.py
+@@ -166,8 +166,9 @@ class Connection(Framer):
+         # If we have a security layer and it sends us no decoded data,
+         # that's OK as long as its return code is happy.
+         if self.security_layer_rx:
+-          status, data = self.security_layer_rx.decode(data)
+-          if not status:
++          try:
++            data = self.security_layer_rx.decode(data)
++          except:
+             self.detach_all()
+             break
+       # When we do not use SSL transport, we get periodic 
+diff --git a/qpid/python/qpid/delegates.py b/qpid/python/qpid/delegates.py
+index 685cf49..5e44a3a 100644
+--- a/qpid/python/qpid/delegates.py
++++ b/qpid/python/qpid/delegates.py
+@@ -24,13 +24,7 @@ from exceptions import VersionError, Closed
+ from logging import getLogger
+ from ops import Control
+ import sys
+-
+-_have_sasl = None
+-try:
+-  import saslwrapper
+-  _have_sasl = True
+-except:
+-  pass
++from qpid import sasl
+ 
+ log = getLogger("qpid.io.ctl")
+ 
+@@ -172,20 +166,19 @@ class Client(Delegate):
+     self.username  = username
+     self.password  = password
+ 
+-    if _have_sasl:
+-      self.sasl = saslwrapper.Client()
+-      if username and len(username) > 0:
+-        self.sasl.setAttr("username", str(username))
+-      if password and len(password) > 0:
+-        self.sasl.setAttr("password", str(password))
+-      self.sasl.setAttr("service", str(kwargs.get("service", "qpidd")))
+-      if "host" in kwargs:
+-        self.sasl.setAttr("host", str(kwargs["host"]))
+-      if "min_ssf" in kwargs:
+-        self.sasl.setAttr("minssf", kwargs["min_ssf"])
+-      if "max_ssf" in kwargs:
+-        self.sasl.setAttr("maxssf", kwargs["max_ssf"])
+-      self.sasl.init()
++    self.sasl = sasl.Client()
++    if username and len(username) > 0:
++      self.sasl.setAttr("username", str(username))
++    if password and len(password) > 0:
++      self.sasl.setAttr("password", str(password))
++    self.sasl.setAttr("service", str(kwargs.get("service", "qpidd")))
++    if "host" in kwargs:
++      self.sasl.setAttr("host", str(kwargs["host"]))
++    if "min_ssf" in kwargs:
++      self.sasl.setAttr("minssf", kwargs["min_ssf"])
++    if "max_ssf" in kwargs:
++      self.sasl.setAttr("maxssf", kwargs["max_ssf"])
++    self.sasl.init()
+ 
+   def start(self):
+     # XXX
+@@ -204,39 +197,29 @@ class Client(Delegate):
+         mech_list += str(mech) + " "
+     mech = None
+     initial = None
+-    if _have_sasl:
+-      status, mech, initial = self.sasl.start(mech_list)
+-      if status == False:
+-        raise Closed("SASL error: %s" % self.sasl.getError())
+-    else:
+-      if self.username and self.password and ("PLAIN" in mech_list):
+-        mech = "PLAIN"
+-        initial = "\0%s\0%s" % (self.username, self.password)
+-      else:
+-        mech = "ANONYMOUS"
+-        if not mech in mech_list:
+-          raise Closed("No acceptable SASL authentication mechanism available")
++    try:
++      mech, initial = self.sasl.start(mech_list)
++    except Exception, e:
++      raise Closed(str(e))
+     ch.connection_start_ok(client_properties=self.client_properties,
+                            mechanism=mech, response=initial)
+ 
+   def connection_secure(self, ch, secure):
+     resp = None
+-    if _have_sasl:
+-      status, resp = self.sasl.step(secure.challenge)
+-      if status == False:
+-        raise Closed("SASL error: %s" % self.sasl.getError())
++    try:
++      resp = self.sasl.step(secure.challenge)
++    except Exception, e:
++      raise Closed(str(e))
+     ch.connection_secure_ok(response=resp)
+ 
+   def connection_tune(self, ch, tune):
+     ch.connection_tune_ok(heartbeat=self.heartbeat)
+     ch.connection_open()
+-    if _have_sasl:
+-      self.connection.user_id = self.sasl.getUserId()
+-      self.connection.security_layer_tx = self.sasl
++    self.connection.user_id = self.sasl.auth_username()
++    self.connection.security_layer_tx = self.sasl
+ 
+   def connection_open_ok(self, ch, open_ok):
+-    if _have_sasl:
+-      self.connection.security_layer_rx = self.sasl
++    self.connection.security_layer_rx = self.sasl
+     self.connection.opened = True
+     notify(self.connection.condition)
+ 
+diff --git a/qpid/python/qpid/framer.py b/qpid/python/qpid/framer.py
+index 47f57cf..8e4ef01 100644
+--- a/qpid/python/qpid/framer.py
++++ b/qpid/python/qpid/framer.py
+@@ -51,9 +51,10 @@ class Framer(Packer):
+     self.sock_lock.acquire()
+     try:
+       if self.security_layer_tx:
+-        status, cipher_buf = self.security_layer_tx.encode(self.tx_buf)
+-        if status == False:
+-          raise Closed(self.security_layer_tx.getError())
++        try:
++          cipher_buf = self.security_layer_tx.encode(self.tx_buf)
++        except SASLError, e:
++          raise Closed(str(e))
+         self._write(cipher_buf)
+       else:
+         self._write(self.tx_buf)
+@@ -91,9 +92,10 @@ class Framer(Packer):
+       try:
+         s = self.sock.recv(n) # NOTE: instead of "n", arg should be "self.maxbufsize"
+         if self.security_layer_rx:
+-          status, s = self.security_layer_rx.decode(s)
+-          if status == False:
+-            raise Closed(self.security_layer_tx.getError())
++          try:
++            s = self.security_layer_rx.decode(s)
++          except SASLError, e:
++            raise Closed(str(e))
+       except socket.timeout:
+         if self.aborted():
+           raise Closed()
+diff --git a/qpid/python/qpid/sasl.py b/qpid/python/qpid/sasl.py
+index 677a5e4..25de6de 100644
+--- a/qpid/python/qpid/sasl.py
++++ b/qpid/python/qpid/sasl.py
+@@ -29,6 +29,9 @@ class WrapperClient:
+ 
+   def setAttr(self, name, value):
+     status = self._cli.setAttr(str(name), str(value))
++    if status and name == 'username':
++      status = self._cli.setAttr('externaluser', str(value))
++      
+     if not status:
+       raise SASLError(self._cli.getError())
+ 
+diff --git a/qpid/python/qpid/util.py b/qpid/python/qpid/util.py
+index 8967728..7541595 100644
+--- a/qpid/python/qpid/util.py
++++ b/qpid/python/qpid/util.py
+@@ -25,9 +25,9 @@ except ImportError:
+   from socket import ssl as wrap_socket
+   class ssl:
+ 
+-    def __init__(self, sock):
++    def __init__(self, sock, keyfile=None, certfile=None, trustfile=None):
+       self.sock = sock
+-      self.ssl = wrap_socket(sock)
++      self.ssl = wrap_socket(sock, keyfile=keyfile, certfile=certfile, ca_certs=trustfile)
+ 
+     def recv(self, n):
+       return self.ssl.read(n)
+-- 
+1.7.1
+
+From 7cd287cc7bc2f423a8c30613acf385b4fecae748 Mon Sep 17 00:00:00 2001
+From: Kenneth Anthony Giusti <kgiusti@apache.org>
+Date: Fri, 21 Sep 2012 15:02:58 +0000
+Subject: [PATCH 2/5] Bug 850517 - qpid-tools no longer works with SSL
+ QPID-4337: add SSL support for older python clients.
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/trunk@1388544 13f79535-47bb-0310-9956-ffa450edef68
+(cherry picked from commit 1d55085f6f4fdf1a29ae7a468b189dabf9badef1)
+---
+ qpid/python/qpid/messaging/transports.py |   36 +++++++++++++++++++++++++++++-
+ qpid/python/qpid/util.py                 |    6 ++++-
+ 2 files changed, 40 insertions(+), 2 deletions(-)
+
+diff --git a/qpid/python/qpid/messaging/transports.py b/qpid/python/qpid/messaging/transports.py
+index 532c365..e901e98 100644
+--- a/qpid/python/qpid/messaging/transports.py
++++ b/qpid/python/qpid/messaging/transports.py
+@@ -55,7 +55,41 @@ try:
+   from ssl import wrap_socket, SSLError, SSL_ERROR_WANT_READ, \
+       SSL_ERROR_WANT_WRITE
+ except ImportError:
+-  pass
++
++  ## try the older python SSL api:
++  from socket import ssl
++
++  class old_ssl(SocketTransport):
++    def __init__(self, conn, host, port):
++      SocketTransport.__init__(self, conn, host, port)
++      # Bug (QPID-4337): this is the "old" version of python SSL.
++      # The private key is required. If a certificate is given, but no
++      # keyfile, assume the key is contained in the certificate
++      ssl_keyfile = conn.ssl_keyfile
++      ssl_certfile = conn.ssl_certfile
++      if ssl_certfile and not ssl_keyfile:
++        ssl_keyfile = ssl_certfile
++      self.ssl = ssl(self.socket, keyfile=ssl_keyfile, certfile=ssl_certfile)
++      self.socket.setblocking(1)
++
++    def reading(self, reading):
++      return reading
++
++    def writing(self, writing):
++      return writing
++
++    def recv(self, n):
++      return self.ssl.read(n)
++
++    def send(self, s):
++      return self.ssl.write(s)
++
++    def close(self):
++      self.socket.close()
++
++  TRANSPORTS["ssl"] = old_ssl
++  TRANSPORTS["tcp+tls"] = old_ssl
++    
+ else:
+   class tls(SocketTransport):
+ 
+diff --git a/qpid/python/qpid/util.py b/qpid/python/qpid/util.py
+index 7541595..04a915d 100644
+--- a/qpid/python/qpid/util.py
++++ b/qpid/python/qpid/util.py
+@@ -24,8 +24,12 @@ try:
+ except ImportError:
+   from socket import ssl as wrap_socket
+   class ssl:
+-
+     def __init__(self, sock, keyfile=None, certfile=None, trustfile=None):
++      # Bug (QPID-4337): this is the "old" version of python SSL.
++      # The private key is required. If a certificate is given, but no
++      # keyfile, assume the key is contained in the certificate
++      if certfile and not keyfile:
++        keyfile = certfile
+       self.sock = sock
+       self.ssl = wrap_socket(sock, keyfile=keyfile, certfile=certfile, ca_certs=trustfile)
+ 
+-- 
+1.7.1
+
+From 1b95829038e0c5710763abcbadb26ddd746f5402 Mon Sep 17 00:00:00 2001
+From: Kenneth Anthony Giusti <kgiusti@apache.org>
+Date: Thu, 16 Aug 2012 17:59:51 +0000
+Subject: [PATCH 3/5] Bug 850517 - qpid-tools no longer works with SSL
+ NO-JIRA: remove unsupported argument.
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/trunk@1373957 13f79535-47bb-0310-9956-ffa450edef68
+(cherry picked from commit a2eb4becc8e99524415183fe05ea407c87ff3798)
+---
+ qpid/python/qpid/util.py |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/qpid/python/qpid/util.py b/qpid/python/qpid/util.py
+index 04a915d..5b1a876 100644
+--- a/qpid/python/qpid/util.py
++++ b/qpid/python/qpid/util.py
+@@ -31,7 +31,7 @@ except ImportError:
+       if certfile and not keyfile:
+         keyfile = certfile
+       self.sock = sock
+-      self.ssl = wrap_socket(sock, keyfile=keyfile, certfile=certfile, ca_certs=trustfile)
++      self.ssl = wrap_socket(sock, keyfile=keyfile, certfile=certfile)
+ 
+     def recv(self, n):
+       return self.ssl.read(n)
+-- 
+1.7.1
+
+From dce0dab322890159fdb32b148940c1a82cf9e620 Mon Sep 17 00:00:00 2001
+From: Rafael H. Schloming <rhs@apache.org>
+Date: Mon, 30 Jul 2012 23:03:46 +0000
+Subject: [PATCH 4/5] Bug 841196, QPID-4147: made selector handle interrupt based on patch from siddesh
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/trunk@1367354 13f79535-47bb-0310-9956-ffa450edef68
+---
+ qpid/python/qpid/selector.py                  |   24 ++++++++++++++++++------
+ qpid/python/qpid/tests/messaging/endpoints.py |   12 ++++++++++++
+ 2 files changed, 30 insertions(+), 6 deletions(-)
+
+diff --git a/qpid/python/qpid/selector.py b/qpid/python/qpid/selector.py
+index ca5946c..ff94091 100644
+--- a/qpid/python/qpid/selector.py
++++ b/qpid/python/qpid/selector.py
+@@ -16,7 +16,7 @@
+ # specific language governing permissions and limitations
+ # under the License.
+ #
+-import atexit, time
++import atexit, time, errno
+ from compat import select, set, selectable_waiter
+ from threading import Thread, Lock
+ 
+@@ -111,12 +111,24 @@ class Selector:
+           else:
+             wakeup = min(wakeup, t)
+ 
+-      if wakeup is None:
+-        timeout = None
+-      else:
+-        timeout = max(0, wakeup - time.time())
++      rd = []
++      wr = []
++      ex = []
+ 
+-      rd, wr, ex = select(self.reading, self.writing, (), timeout)
++      while True:
++        try:
++          if wakeup is None:
++            timeout = None
++          else:
++            timeout = max(0, wakeup - time.time())
++          rd, wr, ex = select(self.reading, self.writing, (), timeout)
++          break
++        except Exception, (err, strerror):
++          # Repeat the select call if we were interrupted.
++          if err == errno.EINTR:
++            continue
++          else:
++            raise
+ 
+       for sel in wr:
+         if sel.writing():
+diff --git a/qpid/python/qpid/tests/messaging/endpoints.py b/qpid/python/qpid/tests/messaging/endpoints.py
+index 62deacd..a82a9e9 100644
+--- a/qpid/python/qpid/tests/messaging/endpoints.py
++++ b/qpid/python/qpid/tests/messaging/endpoints.py
+@@ -1333,3 +1333,15 @@ class SenderTests(Base):
+     self.drain(self.rcv, expected=msgs)
+     self.ssn.acknowledge()
+     assert caught, "did not exceed capacity"
++
++  def testEINTR(self):
++    m1 = self.content("testEINTR", 0)
++    m2 = self.content("testEINTR", 1)
++
++    self.snd.send(m1, timeout=self.timeout())
++    try:
++      os.setuid(500)
++      assert False, "setuid should fail"
++    except:
++      pass
++    self.snd.send(m2, timeout=self.timeout())
+-- 
+1.7.1
+
+From eddb58c5f542f6f78ab2547da5c57db3b4559a75 Mon Sep 17 00:00:00 2001
+From: Justin Ross <jross@apache.org>
+Date: Wed, 17 Oct 2012 21:42:15 +0000
+Subject: [PATCH 5/5] Bug 856299, QPID-4102: Pass down the timeout argument; patch from Ernie Allen
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/trunk@1399445 13f79535-47bb-0310-9956-ffa450edef68
+---
+ qpid/python/qpid/messaging/endpoints.py |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/qpid/python/qpid/messaging/endpoints.py b/qpid/python/qpid/messaging/endpoints.py
+index e632c0c..95ff551 100644
+--- a/qpid/python/qpid/messaging/endpoints.py
++++ b/qpid/python/qpid/messaging/endpoints.py
+@@ -871,7 +871,7 @@ class Sender(Endpoint):
+     self.queued += 1
+ 
+     if sync:
+-      self.sync()
++      self.sync(timeout=timeout)
+       assert message not in self.session.outgoing
+     else:
+       self._wakeup()
+-- 
+1.7.1
+

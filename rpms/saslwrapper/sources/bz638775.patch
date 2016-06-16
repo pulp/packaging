@@ -1,0 +1,64 @@
+Index: python/Makefile.am
+===================================================================
+--- python/Makefile.am	(revision 1097098)
++++ python/Makefile.am	(working copy)
+@@ -29,8 +29,7 @@
+ $(generated_file_list): python.i $(top_srcdir)/src/saslwrapper.i
+ 	$(SWIG) -c++ -python -Wall -I/usr/include $(INCLUDES) -o saslwrapper.cpp $(srcdir)/python.i
+ 
+-pylibdir = $(PYTHON_LIB)
+-python_PYTHON = saslwrapper.py
++pyexec_PYTHON = saslwrapper.py
+ pyexec_LTLIBRARIES = _saslwrapper.la
+ 
+ _saslwrapper_la_LDFLAGS = -avoid-version -module -shared
+Index: ruby/Makefile.am
+===================================================================
+--- ruby/Makefile.am	(revision 1097098)
++++ ruby/Makefile.am	(working copy)
+@@ -35,7 +35,7 @@
+ 
+ saslwrapper_la_LDFLAGS = -avoid-version -module -shared ".$(RUBY_DLEXT)"
+ saslwrapper_la_LIBADD = $(RUBY_LIBS) $(top_builddir)/src/libsaslwrapper.la -lsasl2
+-saslwrapper_la_CXXFLAGS = $(INCLUDES) -I$(RUBY_INC) -I$(RUBY_INC_ARCH)
++saslwrapper_la_CXXFLAGS = $(INCLUDES) -I$(RUBY_INC) -I$(RUBY_INC_ARCH) -fno-strict-aliasing
+ nodist_saslwrapper_la_SOURCES = saslwrapper.cpp
+ 
+ CLEANFILES = $(generated_file_list)
+Index: configure.ac
+===================================================================
+--- configure.ac	(revision 1097098)
++++ configure.ac	(working copy)
+@@ -23,7 +23,6 @@
+ AC_PROG_CC_STDC
+ AM_PROG_CC_C_O
+ AC_PROG_CXX
+-AC_USE_SYSTEM_EXTENSIONS
+ AC_LANG([C++])	
+ 
+ # Check for optional use of help2man
+Index: src/Makefile.am
+===================================================================
+--- src/Makefile.am	(revision 1097098)
++++ src/Makefile.am	(working copy)
+@@ -24,6 +24,7 @@
+ 
+ lib_LTLIBRARIES = libsaslwrapper.la
+ libsaslwrapper_la_SOURCES = cyrus/saslwrapper.cpp
++libsaslwrapper_la_CXXFLAGS = -fno-strict-aliasing
+ 
+ # Library Version Information:
+ #
+Index: bootstrap
+===================================================================
+--- bootstrap	(revision 1097098)
++++ bootstrap	(working copy)
+@@ -22,7 +22,7 @@
+ autoheader
+ libtoolize --automake
+ 
+-automake
++automake --add-missing
+ autoconf
+ 
+ if [ "$1" = "-build" -o "$1" = "--build" ] ; then
