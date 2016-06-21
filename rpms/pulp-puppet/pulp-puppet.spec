@@ -14,8 +14,8 @@
 # ---- Pulp (puppet) -----------------------------------------------------------
 
 Name: pulp-puppet
-Version: 2.8.4
-Release: 1%{?dist}
+Version: %{build_version}
+Release: %{build_release}%{?dist}
 Group: Development/Languages
 Summary: Support for Puppet content in the Pulp platform
 License: GPLv2+
@@ -33,7 +33,7 @@ Provides a collection of platform plugins, client extensions and agent
 handlers that provide Puppet support.
 
 %prep
-%setup -q -n pulp_puppet-%{name}-%{version}-1
+%setup -q -n %{name}
 
 %build
 pushd pulp_puppet_common

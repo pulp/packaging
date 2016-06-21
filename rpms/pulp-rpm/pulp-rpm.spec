@@ -13,8 +13,8 @@
 # ---- Pulp (rpm) --------------------------------------------------------------
 
 Name: pulp-rpm
-Version: 2.8.4
-Release: 1%{?dist}
+Version: %{build_version}
+Release: %{build_release}%{?dist}
 Summary: Support for RPM content in the Pulp platform
 Group: Development/Languages
 License: GPLv2+
@@ -32,7 +32,7 @@ handlers that provide RPM support.
 
 
 %prep
-%setup -q -n pulp_rpm-%{name}-%{version}-1
+%setup -q -n %{name}
 
 
 %build

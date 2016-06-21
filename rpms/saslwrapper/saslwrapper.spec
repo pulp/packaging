@@ -3,8 +3,8 @@
 %{!?ruby_sitearch: %global ruby_sitearch %(ruby -rrbconfig -e 'puts Config::CONFIG["sitearchdir"]')}
 
 Name:           saslwrapper
-Version:        0.10
-Release:        8%{?dist}
+Version:        %{build_version}
+Release:        %{build_release}%{?dist}
 Summary:        Ruby and Python wrappers for the cyrus sasl library.
 Group:          System Environment/Libraries
 License:        ASL 2.0

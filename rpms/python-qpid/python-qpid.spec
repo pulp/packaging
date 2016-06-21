@@ -1,8 +1,8 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           python-qpid
-Version:        0.18
-Release:        11%{?dist}
+Version:        %{build_version}
+Release:        %{build_release}%{?dist}
 Group:          Development/Languages
 Summary:        Python client library for AMQP
 License:        ASL 2.0

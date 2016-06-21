@@ -6,8 +6,8 @@
 %endif
 
 Name: gofer
-Version: 2.7.6
-Release: 1%{?dist}
+Version: %{build_version}
+Release: %{build_release}%{?dist}
 Summary: A lightweight, extensible python agent
 Group:   Development/Languages
 License: LGPLv2
@@ -36,7 +36,7 @@ AMQP message broker. Actions are also provided by plug-ins and are
 executed at the specified interval.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}-1
+%setup -q -n %{name}
 
 
 %build

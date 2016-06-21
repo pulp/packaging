@@ -34,12 +34,12 @@
 # ---- Pulp Platform -----------------------------------------------------------
 
 Name: pulp
-Version: 2.8.4
-Release: 2%{?dist}
+Version: %{build_version}
+Release: %{build_release}%{?dist}
 Summary: An application for managing software content
 Group: Development/Languages
 License: GPLv2
-URL: https://fedorahosted.org/pulp/
+URL: https://github.com/%{name}/%{name}/
 Source0: https://github.com/%{name}/%{name}/archive/%{name}-%{version}-1.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
@@ -58,7 +58,7 @@ BuildRequires: rpm-python
 Pulp provides replication, access, and accounting for software repositories.
 
 %prep
-%setup -q -n %{name}-%{name}-%{version}-1
+%setup -q -n %{name}
 
 %build
 for directory in agent bindings client_consumer client_lib common devel
