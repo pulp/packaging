@@ -36,7 +36,7 @@ AMQP message broker. Actions are also provided by plug-ins and are
 executed at the specified interval.
 
 %prep
-%setup -q -n %{name}
+%setup -q -n %{name}-%{name}-%{version}-1
 
 
 %build
