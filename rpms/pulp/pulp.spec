@@ -40,7 +40,7 @@ Summary: An application for managing software content
 Group: Development/Languages
 License: GPLv2
 URL: https://github.com/%{name}/%{name}/
-Source0: https://github.com/%{name}/%{name}/archive/%{version}.tar.gz
+Source0: %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 BuildRequires: python2-devel
@@ -58,7 +58,7 @@ BuildRequires: rpm-python
 Pulp provides replication, access, and accounting for software repositories.
 
 %prep
-%setup -q -n %{name}
+%setup -q -n %{name}-%{version}
 
 %build
 for directory in agent bindings client_consumer client_lib common devel
