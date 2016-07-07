@@ -12,16 +12,17 @@
 
 # ---- Pulp (rpm) --------------------------------------------------------------
 
-Name: pulp-rpm
-Version: 2.8.4
-Release: 1%{?dist}
-Summary: Support for RPM content in the Pulp platform
-Group: Development/Languages
-License: GPLv2+
-URL: https://fedorahosted.org/pulp/
-Source0: https://github.com/pulp/pulp_rpm/archive/%{name}-%{version}-1.tar.gz
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildArch:      noarch
+Name:       pulp-rpm
+Version:    2.8.4
+Release:    1%{?dist}
+Summary:    Support for RPM content in the Pulp platform
+Group:      Development/Languages
+License:    GPLv2+
+URL:        https://github.com/pulp/pulp_rpm
+Source0:    %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch:  noarch
+
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
 BuildRequires:  rpm-python
@@ -32,7 +33,7 @@ handlers that provide RPM support.
 
 
 %prep
-%autosetup -n pulp_rpm-%{name}-%{version}-1
+%autosetup -n %{name}-%{version}
 
 
 %build

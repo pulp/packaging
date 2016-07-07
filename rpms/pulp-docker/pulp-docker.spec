@@ -1,11 +1,11 @@
-Name: pulp-docker
-Version: 2.0.1
-Release: 1%{?dist}
-Summary: Support for Docker layers in the Pulp platform
-License: GPLv2+
-URL: http://pulpproject.org
-Source0: https://github.com/pulp/pulp_docker/archive/%{name}-%{version}-1.tar.gz
-BuildArch:      noarch
+Name:      pulp-docker
+Version:   2.0.1
+Release:   1%{?dist}
+Summary:   Support for Docker layers in the Pulp platform
+License:   GPLv2+
+URL:       https://github.com/pulp/pulp_docker
+Source0:   %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+BuildArch: noarch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -16,7 +16,8 @@ Provides a collection of platform plugins and admin client extensions to
 provide docker support
 
 %prep
-%autosetup  -n pulp_docker-%{name}-%{version}-1
+%autosetup -n %{name}-%{version}
+
 
 %build
 pushd common

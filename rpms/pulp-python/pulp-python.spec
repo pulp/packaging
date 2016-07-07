@@ -1,16 +1,16 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 %{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 
-Name: pulp-python
-Version: 1.1.1
-Release: 1%{?dist}
-Summary: Support for Python content in the Pulp platform
-Group: Development/Languages
-License: GPLv2
-URL: https://github.com/pulp/pulp_python
-Source0: https://github.com/pulp/pulp_python/archive/%{name}-%{version}-1.tar.gz
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildArch:      noarch
+Name:       pulp-python
+Version:    1.1.1
+Release:    1%{?dist}
+Summary:    Support for Python content in the Pulp platform
+Group:      Development/Languages
+License:    GPLv2+
+URL:        https://github.com/pulp/pulp_python
+Source0:    %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+BuildRoot:  %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch:  noarch
 BuildRequires:  python-setuptools
 
 # This is the minimum platform version we require to function.
@@ -21,7 +21,7 @@ Provides a collection of platform plugins and client extensions support for Pyth
 
 
 %prep
-%autosetup -n pulp_python-%{name}-%{version}-1
+%autosetup -n %{name}-%{version}
 
 
 %build

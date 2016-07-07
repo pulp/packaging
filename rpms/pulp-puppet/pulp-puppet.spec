@@ -13,14 +13,14 @@
 
 # ---- Pulp (puppet) -----------------------------------------------------------
 
-Name: pulp-puppet
-Version: 2.8.4
-Release: 1%{?dist}
-Summary: Support for Puppet content in the Pulp platform
-License: GPLv2+
-URL: https://pulpproject.org
-Source0: https://github.com/pulp/pulp_puppet/archive/%{name}-%{version}-1.tar.gz
-BuildArch:      noarch
+Name:       pulp-puppet
+Version:    2.8.4
+Release:    1%{?dist}
+License:	GPLv2+
+Summary:	Support for Puppet content in the Pulp Platform
+URL:		https://github.com/pulp/pulp_puppet
+Source0:   %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+BuildArch:	noarch
 
 BuildRequires:  python2-devel
 BuildRequires:  python-setuptools
@@ -31,7 +31,7 @@ Provides a collection of platform plugins, client extensions and agent
 handlers that provide Puppet support.
 
 %prep
-%autosetup -n pulp_puppet-%{name}-%{version}-1
+%autosetup -n %{name}-%{version}
 
 %build
 pushd pulp_puppet_common

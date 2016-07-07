@@ -2,14 +2,14 @@
 %global platform_version 2.8
 
 
-Name: pulp-ostree
-Version: 1.1.1
-Release: 1%{?dist}
-Summary: Support for OSTree content in the Pulp platform
-License: GPLv2+
-URL: http://pulpproject.org
-Source0: https://github.com/pulp/pulp_ostree/archive/%{name}-%{version}-1.tar.gz
-BuildArch: noarch
+Name:       pulp-ostree
+Version:    1.1.1
+Release:    1%{?dist}
+Summary:    Support for OSTree content in the Pulp platform
+License:	GPLv2+
+URL:		https://github.com/pulp/pulp_ostree
+Source0:    %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+BuildArch:	noarch
 
 BuildRequires: python2-devel
 BuildRequires: python-setuptools
@@ -22,7 +22,7 @@ provide OSTree support.
 
 
 %prep
-%autosetup -n pulp_ostree-%{name}-%{version}-1
+%autosetup -n %{name}-%{version}
 
 
 %build
