@@ -12,7 +12,7 @@ Release: 1%{?dist}
 License:   GPLv2+
 Summary:   %{sum}
 URL:       https://github.com/pulp/crane
-Source0:   %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:   %{url}/archive/%{version}/crane-%{version}.tar.gz
 BuildArch: noarch
 
 BuildRequires: python2-devel
