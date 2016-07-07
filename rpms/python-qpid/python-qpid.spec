@@ -1,8 +1,8 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 Name:           python-qpid
-Version:        %{build_version}
-Release:        %{build_release}%{?dist}
+Version:        0.18
+Release:        10%{?dist}
 Group:          Development/Languages
 Summary:        Python client library for AMQP
 License:        ASL 2.0
@@ -54,5 +54,5 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Wed Jun 15 2016 Jeremy Cline <jcline@redhat.com> 0.18-11
+* Wed Jun 15 2016 Jeremy Cline <jcline@redhat.com> 0.18-10
 - Import spec file

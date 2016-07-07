@@ -3,8 +3,8 @@
 %{!?ruby_sitearch: %global ruby_sitearch %(ruby -rrbconfig -e 'puts Config::CONFIG["sitearchdir"]')}
 
 Name:           saslwrapper
-Version:        %{build_version}
-Release:        %{build_release}%{?dist}
+Version:        0.10
+Release:        8%{?dist}
 Summary:        Ruby and Python wrappers for the cyrus sasl library.
 Group:          System Environment/Libraries
 License:        ASL 2.0
@@ -113,5 +113,5 @@ make check
 %ruby_sitearch/saslwrapper.so
 
 %changelog
-* Thu Jun 16 2016 Jeremy Cline <jcline@redhat.com> 0.10-9
+* Thu Jun 16 2016 Jeremy Cline <jcline@redhat.com> 0.10-8
 - Import spec file

@@ -6,8 +6,8 @@
 %endif
 
 Name: gofer
-Version: %{build_version}
-Release: %{build_release}%{?dist}
+Version: 2.7.6
+Release: 1%{?dist}
 Summary: A lightweight, extensible python agent
 Group:   Development/Languages
 License: LGPLv2
