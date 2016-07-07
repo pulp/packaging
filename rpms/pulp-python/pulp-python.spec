@@ -9,7 +9,7 @@ Release: 1%{?dist}
 License:   GPLv2+
 Summary:   Support for Python content in the Pulp platform
 URL:       https://github.com/pulp/pulp_python
-Source0:   %{url}/archive/%{name}-%{version}-1.tar.gz
+Source0:   %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch: noarch
 
 BuildRequires:  python2-devel
@@ -23,7 +23,7 @@ for Python packages.
 
 
 %prep
-%autosetup -n pulp_python-pulp-python-%{version}-1
+%autosetup -n %{name}-%{version}
 
 
 %build

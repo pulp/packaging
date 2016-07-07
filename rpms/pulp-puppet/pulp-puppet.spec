@@ -8,7 +8,7 @@ Release:	1%{?dist}
 License:	GPLv2+
 Summary:	Support for Puppet content in the Pulp Platform
 URL:		https://github.com/pulp/pulp_puppet
-Source0:	https://github.com/pulp/pulp_puppet/archive/%{name}-%{version}-1.tar.gz
+Source0:   %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:	noarch
 
 BuildRequires:	python2-devel
@@ -22,7 +22,7 @@ handlers that provide Puppet support
 
 
 %prep
-%autosetup -n pulp_puppet-%{name}-%{version}-1
+%autosetup -n %{name}-%{version}
 
 
 %build

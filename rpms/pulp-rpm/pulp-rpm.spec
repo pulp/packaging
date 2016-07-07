@@ -8,7 +8,7 @@ Release: 1%{?dist}
 License:   GPLv2+
 Summary:   Support for RPM content in the Pulp platform
 URL:       https://github.com/pulp/pulp_rpm
-Source0:   https://github.com/pulp/pulp_rpm/archive/%{name}-%{version}-1.tar.gz
+Source0:   %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch: noarch
 
 BuildRequires:  python-rpm-macros
@@ -24,7 +24,7 @@ handlers that provide RPM support.
 
 
 %prep
-%autosetup -n pulp_rpm-%{name}-%{version}-1
+%autosetup -n %{name}-%{version}
 
 
 %build

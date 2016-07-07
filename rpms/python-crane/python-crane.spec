@@ -12,7 +12,7 @@ Release: 1%{?dist}
 License:   GPLv2+
 Summary:   %{sum}
 URL:       https://github.com/pulp/crane
-Source0:   https://github.com/pulp/crane/archive/python-crane-%{version}-1.tar.gz
+Source0:   %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch: noarch
 
 BuildRequires: python2-devel
@@ -47,7 +47,7 @@ Provides: bundled(patternflyicons-fonts-web)
 
 
 %prep
-%autosetup -n crane-python-crane-%{version}-1
+%autosetup -n crane-%{version}
 
 
 %build
