@@ -23,6 +23,22 @@ BUILD_ORDER = python-amqp \
 			  python-crane \
 			  python-nectar
 
+# The important dependencies are:
+# 	python-kombu BuildRequires python-amqp
+BUILD_ORDER = python-amqp \
+			  python-kombu \
+			  python-celery \
+			  python-pymongo \
+			  python-mongoengine \
+			  pulp \
+			  pulp-docker \
+			  pulp-ostree \
+			  pulp-puppet \
+			  pulp-python \
+			  pulp-rpm \
+			  python-crane \
+			  python-nectar
+
 
 all: help
 

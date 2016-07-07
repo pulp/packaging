@@ -7,7 +7,7 @@ Release: 1%{?dist}
 License:   GPLv2+
 Summary:   Support for Docker content in the Pulp platform
 URL:       https://github.com/pulp/pulp_docker
-Source0:   https://github.com/pulp/pulp_docker/archive/%{name}-%{version}-1.tar.gz
+Source0:   %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch: noarch
 
 BuildRequires: python2-devel
@@ -22,7 +22,7 @@ support Docker content.
 
 
 %prep
-%autosetup -n pulp_docker-%{name}-%{version}-1
+%autosetup -n %{name}-%{version}
 
 
 %build

@@ -7,7 +7,7 @@ Release:	1%{?dist}
 License:	GPLv2+
 Summary:	Support for OSTree content in the Pulp platform
 URL:		https://github.com/pulp/pulp_ostree
-Source0:	https://github.com/pulp/pulp_ostree/archive/%{name}-%{version}-1.tar.gz
+Source0:    %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildArch:	noarch
 
 BuildRequires:	python2-devel
@@ -21,7 +21,7 @@ for OSTree content.
 
 
 %prep
-%autosetup -n pulp_ostree-%{name}-%{version}-1
+%autosetup -n %{name}-%{version}
 
 
 %build
