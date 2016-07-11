@@ -7,7 +7,7 @@ License:        GPLv2+
 Group:          Development/Tools
 Summary:        A download library that separates workflow from implementation details
 URL:            https://github.com/pulp/nectar
-Source0:        %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/%{version}/nectar-%{version}.tar.gz
 
 BuildRequires:  python-setuptools
 BuildRequires:  python2-devel

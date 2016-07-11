@@ -7,12 +7,12 @@ a URL formed with per-repository settings.
 
 Name: python-crane
 Version: 2.0.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 
 License:   GPLv2+
 Summary:   %{sum}
 URL:       https://github.com/pulp/crane
-Source0:   %{url}/archive/%{version}/%{name}-%{version}.tar.gz
+Source0:   %{url}/archive/%{version}/crane-%{version}.tar.gz
 BuildArch: noarch
 
 BuildRequires: python2-devel
@@ -77,20 +77,27 @@ install -pm644 deployment/crane.wsgi %{buildroot}/%{_datadir}/crane/
 
 %post
 if /usr/sbin/selinuxenabled; then
-    semanage fcontext -a -t httpd_sys_content_t '%{_var}/lib/crane(/.*)?'
-    restorecon -R -v %{_var}/lib/crane
+    if [ -d "%{_var}/lib/crane" ]; then
+        semanage fcontext -a -t httpd_sys_content_t '%{_var}/lib/crane(/.*)?'
+        restorecon -R -v %{_var}/lib/crane
+    fi
 fi
 
 
 %postun
 if [ $1 -eq 0 ] ; then  # final removal
     if /usr/sbin/selinuxenabled; then
-        semanage fcontext -d -t httpd_sys_content_t '%{_var}/lib/crane(/.*)?'
-        restorecon -R -v %{_var}/lib/crane
+        if [ -d "%{_var}/lib/crane" ]; then
+            semanage fcontext -d -t httpd_sys_content_t '%{_var}/lib/crane(/.*)?'
+            restorecon -R -v %{_var}/lib/crane
+        fi
     fi
 fi
 
 
 %changelog
+* Mon Jul 11 2016 Jeremy Cline <jcline@redhat.com> - 2.0.0-2
+- Update post/postun scripts to check for the directory before using semanage
+
 * Mon May 09 2016 Randy Barlow <rbarlow@redhat.com> - 2.0.0-1
 - Initial import from Fedora 24.
