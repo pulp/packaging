@@ -1,6 +1,3 @@
-# define required pulp platform version.
-%global pulp_version 2.8.4
-
 Name: pulp-rpm
 Version: 2.8.4
 Release: 1%{?dist}
@@ -80,7 +77,7 @@ touch %{buildroot}/%{_sysconfdir}/yum.repos.d/pulp.repo
 # ---- Admin Extensions --------------------------------------------------------
 %package admin-extensions
 Summary: The RPM admin client extensions
-Requires: pulp-admin-client = %{pulp_version}
+Requires: pulp-admin-client = %{version}
 Requires: python-pulp-rpm-common = %{version}
 
 
@@ -99,7 +96,7 @@ client capabilities with RPM specific features.
 # ---- Consumer Extensions -----------------------------------------------------
 %package consumer-extensions
 Summary: The RPM consumer client extensions
-Requires: pulp-consumer-client = %{pulp_version}
+Requires: pulp-consumer-client = %{version}
 Requires: python-pulp-rpm-common = %{version}
 
 
@@ -152,7 +149,7 @@ Documentation for the Pulp RPM plugins.
 Summary: Pulp agent rpm handlers
 Requires: fedora-repos
 Requires: python-rhsm
-Requires: python-pulp-agent-lib = %{pulp_version}
+Requires: python-pulp-agent-lib = %{version}
 Requires: python-pulp-rpm-common = %{version}
 
 
@@ -181,13 +178,13 @@ Requires: createrepo >= 0.9.9-21
 Requires: createrepo_c >= 0.4.1-1
 Requires: genisoimage
 Requires: m2crypto
-Requires: pulp-server = %{pulp_version}
+Requires: pulp-server = %{version}
 Requires: pyliblzma
 Requires: python-lxml
 Requires: python-nectar >= 1.2.1
 Requires: python-rhsm >= 1.8.0
 Requires: python2-pulp-oid_validation >= 2.7.0
-Requires: python2-pulp-rpm-common = %{pulp_version}
+Requires: python2-pulp-rpm-common = %{version}
 
 
 %description plugins
@@ -212,7 +209,7 @@ to provide RPM specific support.
 %package yumplugins
 Summary: Yum plugins supplementing in Pulp consumer operations
 Requires: python-rhsm >= 1.8.0
-Requires: python2-pulp-bindings = %{pulp_version}
+Requires: python2-pulp-bindings = %{version}
 Requires: yum
 
 
@@ -231,7 +228,7 @@ A collection of yum plugins supplementing Pulp consumer operations.
 %package -n python2-pulp-rpm-common
 Summary: Pulp RPM support common library
 Group: Development/Languages
-Requires: python-pulp-common = %{pulp_version}
+Requires: python-pulp-common = %{version}
 %{?python_provide:%python_provide python2-pulp-rpm-common}
 
 
