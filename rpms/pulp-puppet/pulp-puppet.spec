@@ -1,6 +1,3 @@
-%global required_pulp_version 2.8.4
-
-
 Name:		pulp-puppet
 Version:	2.8.4
 Release:	1%{?dist}
@@ -78,7 +75,7 @@ install -pm644 pulp_puppet_handlers/etc/pulp/agent/conf.d/* \
 # ---- Admin Extensions
 %package admin-extensions
 Summary:	The Pulp Puppet admin client extensions
-Requires:	pulp-admin-client = %{required_pulp_version}
+Requires:	pulp-admin-client = %{version}
 Requires:	python2-pulp-puppet-common = %{version}
 
 
@@ -98,7 +95,7 @@ client capabilities with Puppet specific features.
 # ---- Consumer Extensions
 %package consumer-extensions
 Summary:	The Pulp Puppet consumer client extensions
-Requires:	pulp-consumer-client = %{required_pulp_version}
+Requires:	pulp-consumer-client = %{version}
 Requires:	python2-pulp-puppet-common = %{version}
 
 
@@ -149,7 +146,7 @@ Documentation for the Pulp Puppet plugins
 # ---- Agent Handlers
 %package handlers
 Summary:	Pulp agent puppet handlers
-Requires:	python2-pulp-agent-lib >= %{required_pulp_version}
+Requires:	python2-pulp-agent-lib >= %{version}
 Requires:	python2-pulp-puppet-common = %{version}
 Requires:	puppet >= 2.7.14
 
@@ -173,7 +170,7 @@ uninstall, bind, and unbind.
 %package plugins
 Summary:	Pulp Puppet Plugins
 Requires:	python2-pulp-puppet-common = %{version}
-Requires:	pulp-server = %{required_pulp_version}
+Requires:	pulp-server = %{version}
 Requires:	python-semantic_version >= 2.2.0
 Requires:	python-pycurl
 
@@ -200,7 +197,7 @@ to provide Puppet specific support.
 Summary:	Pulp Puppet tools
 Requires:	puppet >= 2.7
 Requires:	git >= 1.7
-Requires:   python2-pulp-puppet-common = %{required_pulp_version}
+Requires:   python2-pulp-puppet-common = %{version}
 
 
 %description tools
@@ -218,7 +215,7 @@ A collection of tools used to manage puppet modules.
 # ---- Common
 %package -n python2-pulp-puppet-common
 Summary:	Pulp Puppet support common library
-Requires:	python2-pulp-common >= %{required_pulp_version}
+Requires:	python2-pulp-common >= %{version}
 %{?python_provide:%python_provide python2-pulp-puppet-common}
 
 
