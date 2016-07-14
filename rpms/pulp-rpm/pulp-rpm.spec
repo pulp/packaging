@@ -124,16 +124,12 @@ touch %{buildroot}/%{_sysconfdir}/yum.repos.d/pulp.repo
 rm -rf %{buildroot}
 
 
-# define required pulp platform version.
-%global pulp_version %{version}
-
-
 # ---- RPM Common --------------------------------------------------------------
 
 %package -n python-pulp-rpm-common
 Summary: Pulp RPM support common library
 Group: Development/Languages
-Requires: python-pulp-common = %{pulp_version}
+Requires: python-pulp-common = %{version}
 Obsoletes: python-pulp-rpm-extension <= 2.4.0
 
 %description -n python-pulp-rpm-common
@@ -153,9 +149,9 @@ A collection of modules shared among all RPM components.
 %package plugins
 Summary: Pulp RPM plugins
 Group: Development/Languages
-Requires: python-pulp-rpm-common = %{pulp_version}
+Requires: python-pulp-rpm-common = %{version}
 Requires: python-pulp-oid_validation >= 2.7.0
-Requires: pulp-server = %{pulp_version}
+Requires: pulp-server = %{version}
 Requires: createrepo >= 0.9.9-21
 Requires: createrepo_c >= 0.4.1-1
 Requires: python-rhsm >= 1.8.0
@@ -190,8 +186,8 @@ to provide RPM specific support.
 %package admin-extensions
 Summary: The RPM admin client extensions
 Group: Development/Languages
-Requires: pulp-admin-client = %{pulp_version}
-Requires: python-pulp-rpm-common = %{pulp_version}
+Requires: pulp-admin-client = %{version}
+Requires: python-pulp-rpm-common = %{version}
 
 %description admin-extensions
 A collection of extensions that supplement and override generic admin
@@ -210,7 +206,7 @@ client capabilites with RPM specific features.
 %package consumer-extensions
 Summary: The RPM consumer client extensions
 Group: Development/Languages
-Requires: pulp-consumer-client = %{pulp_version}
+Requires: pulp-consumer-client = %{version}
 
 %description consumer-extensions
 A collection of extensions that supplement and override generic consumer
@@ -229,8 +225,8 @@ client capabilites with RPM specific features.
 Summary: Pulp agent rpm handlers
 Group: Development/Languages
 Requires: python-rhsm
-Requires: python-pulp-rpm-common = %{pulp_version}
-Requires: python-pulp-agent-lib = %{pulp_version}
+Requires: python-pulp-rpm-common = %{version}
+Requires: python-pulp-agent-lib = %{version}
 
 %description handlers
 A collection of handlers that provide both Linux and RPM specific
@@ -256,7 +252,7 @@ Summary: Yum plugins supplementing in Pulp consumer operations
 Group: Development/Languages
 Requires: yum
 Requires: python-rhsm >= 1.8.0
-Requires: python-pulp-bindings = %{pulp_version}
+Requires: python-pulp-bindings = %{version}
 
 %description yumplugins
 A collection of yum plugins supplementing Pulp consumer operations.
