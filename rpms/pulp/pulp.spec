@@ -151,11 +151,15 @@ install -pm644 nodes/parent/etc/pulp/server/plugins.conf.d/nodes/distributor/htt
 # WWW
 install -d %{buildroot}/%{_datadir}/pulp/templates/
 
+install -d %{buildroot}/etc/logrotate.d
+
 ln -s %{_sharedstatedir}/pulp/content %{buildroot}/%{_var}/www/pulp/nodes
 ln -s %{_sharedstatedir}/pulp/nodes/published/http %{buildroot}/%{_var}/www/pulp/nodes
 ln -s %{_sharedstatedir}/pulp/nodes/published/https %{buildroot}/%{_var}/www/pulp/nodes
 
 install -pm644 server/usr/share/pulp/templates/* %{buildroot}/%{_datadir}/pulp/templates/
+
+install -m 644 -p server/etc/logrotate.d/pulp %{buildroot}/etc/logrotate.d/%{name}
 
 # pulp-server installation
 install -d %{buildroot}%{_sysconfdir}/%{name}/content/sources/conf.d
@@ -571,6 +575,7 @@ Pulp provides replication, access, and accounting for software repositories.
 %config(noreplace) %{_sysconfdir}/default/pulp_workers
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/pulp_content.conf
+%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %ghost %{_sysconfdir}/pki/%{name}/ca.crt
 %ghost %{_sysconfdir}/pki/%{name}/rsa_pub.key
 %{_sysconfdir}/%{name}/content
