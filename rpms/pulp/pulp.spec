@@ -1,17 +1,10 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
 %{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
 
-%if 0%{?rhel} == 5
 %define pulp_admin 0
 %define pulp_client_oauth 0
 %define pulp_server 0
 %define pulp_streamer 0
-%else
-%define pulp_admin 1
-%define pulp_client_oauth 1
-%define pulp_server 1
-%define pulp_streamer 1
-%endif
 
 %if %{pulp_server}
 #SELinux
@@ -43,7 +36,7 @@ URL: https://github.com/%{name}/%{name}/
 Source0: %{url}/archive/%{version}/%{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
-BuildRequires: python2-devel
+BuildRequires: python-devel
 BuildRequires: python-setuptools
 # do not include either of these on rhel 5
 %if 0%{?rhel} == 6
@@ -1047,6 +1040,9 @@ Cert-based repo authentication for Pulp
 %endif # End pulp_server if block for repoauth
 
 %changelog
+* Mon Jul 18 2016 Darin Lively <darinlively@gmail.com> 2.8.5-1
+- Added basic SLES build compatibility
+
 * Tue Jun 14 2016 Jeremy Cline <jcline@redhat.com> 2.8.4-2
 - Add python-importlib dependency for pulp-server
 
