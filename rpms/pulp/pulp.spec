@@ -511,6 +511,7 @@ Requires: crontabs
 Requires: genisoimage
 Requires: glibc-common
 Requires: httpd
+Requires: kobo
 Requires: m2crypto
 Requires: mod_ssl
 Requires: mod_wsgi >= 3.4-1.pulp
@@ -535,6 +536,7 @@ Requires: python-mongoengine >= 0.10.0
 Requires: python-oauth2 >= 1.5.211
 Requires: python2-pymongo >= 3.0.0
 Requires: python-setuptools
+Requires: sshpass
 Requires(post): systemd
 Requires(preun): systemd
 Requires(postun): systemd
