@@ -16,7 +16,11 @@ Source0: https://github.com/jortel/gofer/archive/%{name}-%{version}-1.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 BuildRequires: gzip
+%if 0%{?sles_version}
+BuildRequires: python-devel
+%else
 BuildRequires: python2-devel
+%endif
 BuildRequires: python-setuptools
 BuildRequires: rpm-python
 Requires: python-%{name} = %{version}
@@ -209,6 +213,7 @@ Requires: python-qpid-proton >= 0.9-5
 Provides the gofer qpid proton messaging adapter package.
 
 %files -n python-%{name}-proton
+%defattr(-,root,root,-)
 %{python_sitelib}/%{name}/messaging/adapter/proton
 %doc LICENSE
 
