@@ -5,7 +5,7 @@ Name:           python-%{srcname}
 # The Fedora package is using epoch 1, so we need to also do that to make sure ours gets installed
 Epoch:          1
 Version:        3.0.33
-Release:        7.pulp%{?dist}
+Release:        8.pulp%{?dist}
 BuildArch:      noarch
 
 # utils/functional.py contains a header that says Python
@@ -18,6 +18,7 @@ Patch0:         563.patch
 Patch1:         569.patch
 Patch2:         571.patch
 Patch3:         577.patch
+Patch4:         2124.patch
 
 BuildRequires:  python-anyjson
 BuildRequires:  python-nose
@@ -57,10 +58,7 @@ also provide proven and tested solutions to common messaging problems.
 %prep
 %setup -q -n %{srcname}-%{version}
 
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%autosetup -p1 -n %{srcname}-%{version}
 
 # manage requirements on rpm base
 sed -i 's/>=1.0.13,<1.1.0/>=1.3.0/' requirements/default.txt
@@ -86,6 +84,9 @@ sed -i 's/>=1.0.13,<1.1.0/>=1.3.0/' requirements/default.txt
 
 
 %changelog
+* Fri Aug 12 2016 Brian Bouterse <bbouters@redhat.com> - 3.0.33-8.pulp
+- Add patch for an addition fix for celery/kombu#577
+
 * Mon Jun 13 2016 Jeremy Cline <jcline@redhat.com> - 3.0.33-7.pulp
 - Modify the spec file to work with RHEL 6
 
