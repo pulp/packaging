@@ -13,13 +13,6 @@
 %define pulp_streamer 1
 %endif
 
-%if %{pulp_server}
-#SELinux
-%define selinux_variants mls strict targeted
-%define selinux_policyver %(sed -e 's,.*selinux-policy-\\([^/]*\\)/.*,\\1,' /usr/share/selinux/devel/policyhelp 2> /dev/null)
-%define moduletype apps
-%endif
-
 # Determine whether we should target Upstart or systemd for this build
 %if 0%{?rhel} >= 7 || 0%{?fedora} >= 15
 %define pulp_systemd 1
@@ -952,12 +945,7 @@ BuildRequires:  selinux-policy-devel
 BuildRequires:  hardlink
 Obsoletes: pulp-selinux-server
 
-%if "%{selinux_policyver}" != ""
-Requires: selinux-policy >= %{selinux_policyver}
-%endif
-%if 0%{?fedora} == 19
-Requires(post): selinux-policy-targeted >= 3.12.1-74
-%endif
+Requires: selinux-policy >= 3
 Requires(post): policycoreutils-python
 Requires(post): /usr/sbin/semodule, /sbin/fixfiles, /usr/sbin/semanage
 Requires(postun): /usr/sbin/semodule
@@ -1002,9 +990,9 @@ exit 0
 %{_datadir}/selinux/*/pulp-server.pp
 %{_datadir}/selinux/*/pulp-celery.pp
 %{_datadir}/selinux/*/pulp-streamer.pp
-%{_datadir}/selinux/devel/include/%{moduletype}/pulp-server.if
-%{_datadir}/selinux/devel/include/%{moduletype}/pulp-celery.if
-%{_datadir}/selinux/devel/include/%{moduletype}/pulp-streamer.if
+%{_datadir}/selinux/devel/include/apps/pulp-server.if
+%{_datadir}/selinux/devel/include/apps/pulp-celery.if
+%{_datadir}/selinux/devel/include/apps/pulp-streamer.if
 
 %endif # End selinux if block
 
