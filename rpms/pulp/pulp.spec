@@ -1,8 +1,3 @@
-#SELinux
-%global selinux_variants mls strict targeted
-%global selinux_policyver %(sed -e 's,.*selinux-policy-\\([^/]*\\)/.*,\\1,' /usr/share/selinux/devel/policyhelp 2> /dev/null)
-%global moduletype apps
-
 # Required gofer version
 %global gofer_version 2.5
 
