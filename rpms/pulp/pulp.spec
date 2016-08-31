@@ -525,6 +525,7 @@ Requires: genisoimage
 Requires: glibc-common
 Requires: httpd
 Requires: httpd-filesystem
+Requires: kobo
 Requires: m2crypto
 Requires: mod_ssl
 Requires: mod_wsgi >= 3.4-1.pulp
