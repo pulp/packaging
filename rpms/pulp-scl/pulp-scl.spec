@@ -1,0 +1,171 @@
+# We specificall separate the 'pulp' and '-scl' parts from each other.
+# since spec file macros don't allow '-' and the auto generated ones
+# are based on %scl_name
+%global scl_name_base pulp
+%global scl_name_postfix -scl
+
+%global scl_vendor pulp
+%global _scl_prefix /opt/%{scl_vendor}
+
+# scl specific macros
+%global scl %{scl_name_base}%{scl_name_postfix}
+%scl_package %scl
+
+# Python scl macros
+%{!?scl_python:%global scl_python rh-python35}
+%{!?scl_prefix_python:%global scl_prefix_python %{scl_python}-}
+
+# Only for this build, you need to override default __os_install_post,
+# because the default one would find /opt/.../lib/python2.7/ and try
+# to bytecompile with the system /usr/bin/python2.7
+%global __os_install_post %{%{scl_no_vendor}_os_install_post}
+# Similarly, override __python_requires for automatic dependency generator
+%global __python_requires %{%{scl_no_vendor}_python_requires}
+
+# Generate our sitelib variable from %scl_python's sitelib variable.  
+# Secifically, we replace /rh/%{scl_python} with /pulp/pulp-scl/
+%global pulp_sitelib %(echo %{python35python_sitelib} | sed 's|/rh/%{scl_python}|/%{scl_vendor}/%{scl}|')
+
+%global debug_package %{nil}
+%global nfsmountable 1
+
+Name:		%scl_name
+Version:	0.1
+Release:	27%{?dist}
+Summary:	Package that installs %scl
+
+License:	GPLv2+
+Source0:	README
+Source1:	LICENSE
+Source2:	pythondeps-scl-pulp.sh
+
+# Basic scl dependencies
+BuildRequires:	scl-utils-build
+BuildRequires:	help2man
+
+# Python scl dependencies
+BuildRequires:	%{scl_prefix_python}scldevel
+BuildRequires:	%{scl_prefix_python}runtime
+BuildRequires:	%{scl_prefix_python}build
+BuildRequires:	%{scl_prefix_python}python-devel
+
+Requires:	%{scl_python}
+
+%description
+This is the main package for %scl Software Collection
+
+Provides dependencies for pulp (http://pulpproject.org)
+
+%package runtime
+Summary: Package that handles %scl Software Collection
+
+Requires: scl-utils
+Requires: %{scl_prefix_python}runtime
+
+%description runtime
+Package shipping essential scripts to work with %scl Software Collection.
+
+Provides dependencies for pulp (http://pulpproject.org)
+
+%package build
+Summary: Package shipping basic build configuration
+Requires: scl-utils-build
+Requires: %{scl_prefix_python}scldevel
+
+%description build
+Package shipping essential configuration macros to build %scl Software Collection.
+
+Provides dependencies for pulp (http://pulpproject.org)
+
+%package scldevel
+Summary: Package shipping development files for %scl
+
+%description scldevel
+Package shipping development files, especially usefull for development of
+packages depending on %scl Software Collection.
+
+Provides dependencies for pulp (http://pulpproject.org)
+
+%prep
+%setup -T -c
+
+# This generates the destination README from the README template
+# provided in Source0.  This allows us to replace the macro variables
+# with the expanded macro data.
+cat > README << EOF
+%{expand:%(cat %{SOURCE0})}
+EOF
+
+cp %{SOURCE1} .
+
+
+%install
+%scl_install
+
+# Generate the 'enable' script for this scl.  It is important for this script
+# to also enable the %{scl_python} scl as well.  We also want to pre-pend
+# %pulp_sitelib to the PYTHONPATH so it finds our python libs first
+cat >> %{buildroot}%{_scl_scripts}/enable << EOF
+. scl_source enable %{scl_python}
+export PYTHONPATH=%{pulp_sitelib}\${PYTHONPATH:+:\${PYTHONPATH}}
+export PATH=%{_bindir}\${PATH:+:\${PATH}}
+export LD_LIBRARY_PATH=%{_libdir}\${LD_LIBRARY_PATH:+:\${LD_LIBRARY_PATH}}
+export MANPATH=%{_mandir}:\$MANPATH
+export PKG_CONFIG_PATH=%{_libdir}/pkgconfig\${PKG_CONFIG_PATH:+:\${PKG_CONFIG_PATH}}
+export XDG_DATA_DIRS="%{_datadir}:\${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+EOF
+
+mkdir -p %{buildroot}%{pulp_sitelib}
+
+mkdir -p %{buildroot}%{_root_prefix}/lib/rpm
+cp -a %{SOURCE2} %{buildroot}%{_root_prefix}/lib/rpm
+
+# - Enable Software Collection-specific bytecompilation macros from
+# - Also override the %%python_sitelib macro to point to the pulp-scl Software
+#   Collection.
+# - If we have architecture-dependent packages, we will also need to override
+#   the %%python_sitearch macro.
+cat >> %{buildroot}%{_root_sysconfdir}/rpm/macros.%{scl}-config << EOF
+
+%%python35_python_provides /usr/lib/rpm/pythondeps-scl-pulp.sh --provides %{?scl:%scl_prefix_python}
+%%python35_python_requires /usr/lib/rpm/pythondeps-scl-pulp.sh --requires %{?scl:%scl_prefix_python}
+
+%%scl_package_override() %%{expand:%{?python35_os_install_post:%%global __os_install_post %%python35_os_install_post}
+%%global __python_requires %%python35_python_requires
+%%global __python_provides %%python35_python_provides
+%%global __python %python35__python
+%%global python_sitelib %pulp_sitelib
+%%global python3_sitelib %pulp_sitelib
+%%global python_version %python35_python_version
+%%global python3_version %python35_python3_version
+}
+EOF
+
+# Create the scldevel subpackage macros.  This allows us to override
+# the autogenerated ones, as they are autogenerated from %scl_name, and it
+# has a hypehn in it (illegal macro syntax), so we create new ones without
+# the hyphen instead.  (same thing is done for 'rh-' scl packages)
+cat >> %{buildroot}%{_root_sysconfdir}/rpm/macros.%{scl}-scldevel << EOF
+%%scl_%{scl_name_base} %{scl}
+%%scl_prefix_%{scl_name_base} %{scl_prefix}
+%%scl_vendor %{scl_vendor}
+%%_scl_prefix %{_scl_prefix}
+EOF
+
+
+%files
+
+%files runtime 
+%doc README LICENSE
+%scl_files
+%pulp_sitelib
+
+%files build
+%{_root_sysconfdir}/rpm/macros.%{scl}-config
+%{_root_prefix}/lib/rpm/pythondeps-scl-pulp.sh
+
+%files scldevel
+%{_root_sysconfdir}/rpm/macros.%{scl}-scldevel
+
+%changelog
+
