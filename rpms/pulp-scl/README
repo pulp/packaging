@@ -1,0 +1,28 @@
+Package %{scl_name} provides dependencies for the Pulp application,
+shipped as a Software Collection. For more information about Software
+Collections, see the scl(1) man page. By installing the %{scl_name}
+collection, you will get the minimum working set of packages to install
+Pulp.  This collection is not supported for other purposes.
+
+Usage: scl enable %{scl} 'python'
+
+Software Collections allow you to build and execute applications
+which are not located in the filesystem root hierarchy,
+but are stored in an alternative location, which is %{_scl_root}
+in case of the %{scl_name} collection.
+
+Pulp is a software repository managnement tool
+
+When you want to work with the %{scl_name} collection, use the scl
+utility (see the scl(1) man page for usage) to enable the scl
+environment.
+
+Examples:
+scl enable %{scl_name} 'command --arg'
+  Run a specific command with the argument --arg within %{scl_name}
+  software collections environment.
+
+scl enable %{scl_name} bash
+  Run an interactive shell with the %{scl_name} software collection is enabled.
+
+Report bugs to <http://pulp.plan.io>.
