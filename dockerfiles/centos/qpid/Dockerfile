@@ -9,4 +9,4 @@ RUN  yum update -y && \
 
 EXPOSE 5672
 
-ENTRYPOINT ["qpidd", "-t", "--auth=no"]
+ENTRYPOINT ["qpidd", "-t", "--auth=no", "-p", "5672"]
