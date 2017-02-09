@@ -18,6 +18,17 @@ then
     cp -a /var/local/etc_pki_pulp/* /etc/pki/pulp/
 fi
 
+# Update config if a different qpid specified
+if [ -n "$QPID" ]; then
+    sed -i "s;qpid:5672;$QPID:5672;g" /etc/pulp/server.conf
+fi
+
+# add db to hosts if not present
+if [ -n "$DB" ]; then
+    sed -i "s;db:27017;$DB:27017;g" /etc/pulp/server.conf
+fi
+
+
 # a hacky way of waiting until mongo is done initializing itself. Eventually
 # (probably 2.5.1) pulp-manage-db will do this on its own in a reasonable way.
 # It waits currently, but quickly backs off to a poll interval of 32 seconds,
