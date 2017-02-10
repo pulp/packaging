@@ -1,0 +1,945 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: pulp
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: admin-client
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: admin-client:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: dockerfiles/centos/admin-client
+      git:
+        ref: ${PULP_PACKAGING_BRANCH}
+        uri: ${PULP_PACKAGING_REMOTE}
+      type: Git
+    strategy:
+      dockerStrategy:
+        noCache: true
+      type: Docker
+    triggers: []
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: apache
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: apache:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: dockerfiles/centos/apache
+      git:
+        ref: ${PULP_PACKAGING_BRANCH}
+        uri: ${PULP_PACKAGING_REMOTE}
+      type: Git
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: base:latest
+        noCache: true
+      type: Docker
+    triggers:
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: base
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: base:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: dockerfiles/centos/base
+      git:
+        ref: ${PULP_PACKAGING_BRANCH}
+        uri: ${PULP_PACKAGING_REMOTE}
+      type: Git
+    strategy:
+      dockerStrategy:
+        noCache: true
+      type: Docker
+    triggers: []
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: crane
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: crane:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: dockerfiles/centos/crane
+      git:
+        ref: ${PULP_PACKAGING_BRANCH}
+        uri: ${PULP_PACKAGING_REMOTE}
+      type: Git
+    strategy:
+      dockerStrategy:
+        noCache: true
+      type: Docker
+    triggers: []
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: crane-allinone
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: crane-allinone:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: dockerfiles/centos/crane-allinone
+      git:
+        ref: ${PULP_PACKAGING_BRANCH}
+        uri: ${PULP_PACKAGING_REMOTE}
+      type: Git
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: crane:latest
+        noCache: true
+      type: Docker
+    triggers:
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: mongodb
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: mongodb:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: dockerfiles/centos/mongodb
+      git:
+        ref: ${PULP_PACKAGING_BRANCH}
+        uri: ${PULP_PACKAGING_REMOTE}
+      type: Git
+    strategy:
+      dockerStrategy:
+        noCache: true
+      type: Docker
+    triggers: []
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: qpid
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: qpid:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: dockerfiles/centos/qpid
+      git:
+        ref: ${PULP_PACKAGING_BRANCH}
+        uri: ${PULP_PACKAGING_REMOTE}
+      type: Git
+    strategy:
+      dockerStrategy:
+        noCache: true
+      type: Docker
+    triggers: []
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    creationTimestamp: null
+    name: worker
+  spec:
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: worker:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: dockerfiles/centos/worker
+      git:
+        ref: ${PULP_PACKAGING_BRANCH}
+        uri: ${PULP_PACKAGING_REMOTE}
+      type: Git
+    strategy:
+      dockerStrategy:
+        from:
+          kind: ImageStreamTag
+          name: base:latest
+        noCache: true
+      type: Docker
+    triggers:
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: admin-client
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: apache
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: base
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: crane
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: crane-allinone
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: mongodb
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: qpid
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: worker
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: beat
+  spec:
+    replicas: 1
+    selector:
+      name: beat
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: beat
+      spec:
+        containers:
+        - command:
+          - /run.sh
+          - beat
+          image: worker:latest
+          imagePullPolicy: IfNotPresent
+          name: beat
+          resources: {}
+          securityContext:
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /dev/log
+            name: dev-log-volume
+          - mountPath: /etc/pulp
+            name: etc-pulp-volume
+          - mountPath: /etc/pki/pulp
+            name: etc-pki-pulp-volume
+          - mountPath: /var/lib/pulp
+            name: var-lib-pulp-volume
+        - command:
+          - /run.sh
+          - resource_manager
+          image: worker:latest
+          imagePullPolicy: IfNotPresent
+          name: resource-manager
+          resources: {}
+          securityContext:
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /dev/log
+            name: dev-log-volume
+          - mountPath: /etc/pulp
+            name: etc-pulp-volume
+          - mountPath: /etc/pki/pulp
+            name: etc-pki-pulp-volume
+          - mountPath: /var/lib/pulp
+            name: var-lib-pulp-volume
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        serviceAccount: pulp-sa
+        serviceAccountName: pulp-sa
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: dev-log-volume
+          persistentVolumeClaim:
+            claimName: dev-log-claim
+        - name: etc-pulp-volume
+          persistentVolumeClaim:
+            claimName: etc-pulp-claim
+        - name: etc-pki-pulp-volume
+          persistentVolumeClaim:
+            claimName: etc-pki-pulp-claim
+        - name: var-lib-pulp-volume
+          persistentVolumeClaim:
+            claimName: var-lib-pulp-claim
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - resource-manager
+        - beat
+        from:
+          kind: ImageStreamTag
+          name: worker:latest
+          namespace: pulp
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: crane
+  spec:
+    replicas: 1
+    selector:
+      name: crane
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: crane
+      spec:
+        containers:
+        - image: crane-allinone:latest
+          imagePullPolicy: IfNotPresent
+          name: crane
+          resources: {}
+          securityContext:
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /var/log/httpd
+            name: crane-volume
+          - mountPath: /dev/log
+            name: dev-log-volume
+          - mountPath: /etc/pulp
+            name: etc-pulp-volume
+          - mountPath: /etc/pki/pulp
+            name: etc-pki-pulp-volume
+          - mountPath: /var/lib/pulp
+            name: var-lib-pulp-volume
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        serviceAccount: pulp-sa
+        serviceAccountName: pulp-sa
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: crane-volume
+          persistentVolumeClaim:
+            claimName: crane-claim
+        - name: dev-log-volume
+          persistentVolumeClaim:
+            claimName: dev-log-claim
+        - name: etc-pulp-volume
+          persistentVolumeClaim:
+            claimName: etc-pulp-claim
+        - name: etc-pki-pulp-volume
+          persistentVolumeClaim:
+            claimName: etc-pki-pulp-claim
+        - name: var-lib-pulp-volume
+          persistentVolumeClaim:
+            claimName: var-lib-pulp-claim
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - crane
+        from:
+          kind: ImageStreamTag
+          name: crane-allinone:latest
+          namespace: pulp
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: mongodb
+  spec:
+    replicas: 1
+    selector:
+      name: mongodb
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: mongodb
+      spec:
+        containers:
+        - image: mongodb:latest
+          imagePullPolicy: IfNotPresent
+          name: mongodb
+          resources: {}
+          securityContext:
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        serviceAccount: pulp-sa
+        serviceAccountName: pulp-sa
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - mongodb
+        from:
+          kind: ImageStreamTag
+          name: mongodb:latest
+          namespace: pulp
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: pulpapi
+  spec:
+    replicas: 1
+    selector:
+      name: pulpapi
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: pulpapi
+      spec:
+        containers:
+        - image: apache:latest
+          imagePullPolicy: IfNotPresent
+          name: pulpapi
+          resources: {}
+          securityContext:
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /var/log/httpd
+            name: pulpapi-volume
+          - mountPath: /dev/log
+            name: dev-log-volume
+          - mountPath: /etc/pulp
+            name: etc-pulp-volume
+          - mountPath: /etc/pki/pulp
+            name: etc-pki-pulp-volume
+          - mountPath: /var/lib/pulp
+            name: var-lib-pulp-volume
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        serviceAccount: pulp-sa
+        serviceAccountName: pulp-sa
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: pulpapi-volume
+          persistentVolumeClaim:
+            claimName: pulpapi-claim
+        - name: dev-log-volume
+          persistentVolumeClaim:
+            claimName: dev-log-claim
+        - name: etc-pulp-volume
+          persistentVolumeClaim:
+            claimName: etc-pulp-claim
+        - name: etc-pki-pulp-volume
+          persistentVolumeClaim:
+            claimName: etc-pki-pulp-claim
+        - name: var-lib-pulp-volume
+          persistentVolumeClaim:
+            claimName: var-lib-pulp-claim
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - pulpapi
+        from:
+          kind: ImageStreamTag
+          name: apache:latest
+          namespace: pulp
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: prepare
+  spec:
+    replicas: 1
+    selector:
+      name: prepare
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: prepare
+      spec:
+        containers:
+        - image: base:latest
+          imagePullPolicy: IfNotPresent
+          command: ["bash",  "-c", "/setup.sh"]
+          name: prepare
+          resources: {}
+          securityContext:
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /var/log/httpd
+            name: pulpapi-volume
+          - mountPath: /dev/log
+            name: dev-log-volume
+          - mountPath: /etc/pulp
+            name: etc-pulp-volume
+          - mountPath: /etc/pki/pulp
+            name: etc-pki-pulp-volume
+          - mountPath: /var/lib/pulp
+            name: var-lib-pulp-volume
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        serviceAccount: pulp-sa
+        serviceAccountName: pulp-sa
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: pulpapi-volume
+          persistentVolumeClaim:
+            claimName: pulpapi-claim
+        - name: dev-log-volume
+          persistentVolumeClaim:
+            claimName: dev-log-claim
+        - name: etc-pulp-volume
+          persistentVolumeClaim:
+            claimName: etc-pulp-claim
+        - name: etc-pki-pulp-volume
+          persistentVolumeClaim:
+            claimName: etc-pki-pulp-claim
+        - name: var-lib-pulp-volume
+          persistentVolumeClaim:
+            claimName: var-lib-pulp-claim
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - prepare
+        from:
+          kind: ImageStreamTag
+          name: base:latest
+          namespace: pulp
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: qpid
+  spec:
+    replicas: 1
+    selector:
+      name: qpid
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: qpid
+      spec:
+        containers:
+        - image: qpid:latest
+          imagePullPolicy: IfNotPresent
+          name: qpid
+          resources: {}
+          securityContext:
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        serviceAccount: pulp-sa
+        serviceAccountName: pulp-sa
+        terminationGracePeriodSeconds: 30
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - qpid
+        from:
+          kind: ImageStreamTag
+          name: qpid:latest
+          namespace: pulp
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    creationTimestamp: null
+    generation: 1
+    name: worker
+  spec:
+    replicas: 1
+    selector:
+      name: worker
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        creationTimestamp: null
+        labels:
+          name: worker
+      spec:
+        containers:
+        - command:
+          - /run.sh
+          - worker
+          image: worker:latest
+          imagePullPolicy: IfNotPresent
+          name: worker
+          resources: {}
+          securityContext:
+            runAsUser: 0
+          terminationMessagePath: /dev/termination-log
+          volumeMounts:
+          - mountPath: /dev/log
+            name: dev-log-volume
+          - mountPath: /etc/pulp
+            name: etc-pulp-volume
+          - mountPath: /etc/pki/pulp
+            name: etc-pki-pulp-volume
+          - mountPath: /var/lib/pulp
+            name: var-lib-pulp-volume
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        securityContext: {}
+        serviceAccount: pulp-sa
+        serviceAccountName: pulp-sa
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - name: dev-log-volume
+          persistentVolumeClaim:
+            claimName: dev-log-claim
+        - name: etc-pulp-volume
+          persistentVolumeClaim:
+            claimName: etc-pulp-claim
+        - name: etc-pki-pulp-volume
+          persistentVolumeClaim:
+            claimName: etc-pki-pulp-claim
+        - name: var-lib-pulp-volume
+          persistentVolumeClaim:
+            claimName: var-lib-pulp-claim
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - worker
+        from:
+          kind: ImageStreamTag
+          name: worker:latest
+          namespace: pulp
+      type: ImageChange
+  status: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    name: crane
+  spec:
+    ports:
+    - port: 5000
+      protocol: TCP
+      targetPort: 80
+    selector:
+      name: crane
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    name: db
+  spec:
+    ports:
+    - port: 27017
+      protocol: TCP
+      targetPort: 27017
+    selector:
+      name: mongodb
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    name: pulpapi
+  spec:
+    ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: 443
+    selector:
+      name: pulpapi
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    creationTimestamp: null
+    name: qpid
+  spec:
+    ports:
+    - port: 5672
+      protocol: TCP
+      targetPort: 5672
+    selector:
+      name: qpid
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: crane-claim
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 100Mi
+    volumeName: crane-volume
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: dev-log-claim
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 1Gi
+    volumeName: dev-log-volume
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: etc-pki-pulp-claim
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 10Mi
+    volumeName: etc-pki-pulp-volume
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: etc-pulp-claim
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 10Mi
+    volumeName: etc-pulp-volume
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: pulpapi-claim
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 100Mi
+    volumeName: pulpapi-volume
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    name: var-lib-pulp-claim
+  spec:
+    accessModes:
+      - ReadWriteMany
+    resources:
+      requests:
+        storage: 1Gi
+    volumeName: var-lib-pulp-volume
+parameters:
+  - name: PULP_PACKAGING_REMOTE
+    displayName: Remote for pulp packaging repo
+    value: https://github.com/pulp/packaging
+    required: true
+  - name: PULP_PACKAGING_BRANCH
+    displayName: pulp packaging branch
+    value: docker
+    required: true
