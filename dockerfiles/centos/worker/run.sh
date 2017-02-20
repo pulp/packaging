@@ -2,7 +2,7 @@
 
 case $1 in
   worker)
-    if [ -n "$2" ]; then
+    WORKER_NAME=${2:-$(hostname)}
       exec runuser apache \
 	-s /bin/bash \
 	-c "/usr/bin/celery worker \
@@ -10,14 +10,8 @@ case $1 in
 	--loglevel=INFO \
 	-c 1 \
         --umask=18 \
-	-n reserved_resource_worker-$2@$WORKER_HOST \
-	--logfile=/var/log/pulp/reserved_resource_worker-$2.log"
-    else
-      echo "The 'worker' role must be assigned a unique number as the second positional argument."
-      echo "For example 'worker 1'."
-      echo "Exiting"
-      exit 1
-    fi
+	-n reserved_resource_worker-$WORKER_NAME@$WORKER_HOST \
+	--logfile=/var/log/pulp/reserved_resource_worker-$WORKER_NAME.log"
     ;;
   beat)
     exec runuser apache -s /bin/bash -c "/usr/bin/celery beat --workdir /var/lib/pulp/celery/ -A pulp.server.async.app -f /var/log/pulp/celerybeat.log -l INFO"
