@@ -1,23 +1,23 @@
+%{?scl:%scl_package python-amqp}
+%{!?scl:%global pkg_name %{name}}
+
 %global srcname amqp
 
+Name:		%{?scl_prefix}python-amqp
+Version:	2.1.4
+Release:	3%{?dist}
+Summary:	Low-level AMQP client for Python (fork of amqplib)
 
-Name:           python-%{srcname}
-Version:        1.4.9
-Release:        2%{?dist}
+License:	LGPLv2+
+URL:		http://pypi.python.org/pypi/amqp
+Source0:	http://pypi.python.org/packages/source/a/%{srcname}/%{srcname}-%{version}.tar.gz
 
-License:        LGPLv2+
-Summary:        Low-level AMQP client for Python (fork of amqplib)
-Group:          Development/Languages
-URL:            https://github.com/celery/py-amqp
-Source0:        https://github.com/celery/py-amqp/archive/v%{version}.tar.gz
+BuildRequires:  %{?scl_prefix_python}python-devel
+BuildRequires:  %{?scl_prefix_python}python-setuptools
+Requires:	%{?scl_prefix}python-vine >= 1.1.3
+%{?scl:BuildRequires:	%{scl}-build %{scl}-runtime}
 
-BuildArch:      noarch
-
-BuildRequires:  python2-devel
-BuildRequires:  python-setuptools
-BuildRequires:  python-nose
-BuildRequires:  python-sphinx >= 0.8
-
+%{?scl:Requires:	%{scl}-runtime}
 
 %description
 Low-level AMQP client for Python
@@ -26,111 +26,38 @@ This is a fork of amqplib, maintained by the Celery project.
 
 This library should be API compatible with librabbitmq.
 
-
 %prep
-%setup -q -n py-%{srcname}-%{version}
-
+%setup -q -n %{srcname}-%{version}
 
 %build
-%py2_build
-
-# docs generation requires everything to be installed first
-export PYTHONPATH="$( pwd ):$PYTHONPATH"
-# Disable extensions to prevent intersphinx from accessing net during build.
-# Other extensions listed are not used.
-pushd docs
-sed -i s/^extensions/disable_extensions/ conf.py
-SPHINX_DEBUG=1 sphinx-build -b html . build/html
-rm -rf build/html/.doctrees build/html/.buildinfo
-popd
-
+%{?scl:scl enable %{scl} "}
+%{__python} setup.py build
+%{?scl:"}
 
 %install
-%py2_install
-
-# Remove execute bit from example scripts (packaged as doc)
-chmod -x demo/*.py
-
+%{?scl:scl enable %{scl} "}
+%{__python} setup.py install --no-compile --root %{buildroot} --install-purelib %{python_sitelib}
+%{?scl:"}
 
 %files
-%license LICENSE
-%doc AUTHORS Changelog README.rst
-%{python2_sitelib}/%{srcname}/
-%{python2_sitelib}/%{srcname}*.egg-info
-
-
-%package doc
-Summary:        Documentation for python-amqp
-Group:          Documentation
-License:        LGPLv2+
-
-Requires:       %{name} = %{version}-%{release}
-
-
-%description doc
-Documentation for python-amqp
-
-
-%files doc
-%license LICENSE
-%doc AUTHORS
-%doc demo/
-%doc docs/build/html docs/reference
-
+%doc Changelog LICENSE README.rst
+%{python_sitelib}/%{srcname}
+%{python_sitelib}/%{srcname}*.egg-info
 
 %changelog
-* Tue May 10 2016 Randy Barlow <rbarlow@redhat.com> - 1.4.9-2
-- Remove conditionals from the spec file.
-- Correct a date in the changelog.
-- Move docs generation to the build step where it belongs.
-- Use the py2 macros.
-- Use the license macro.
-- Add AUTHORS to the docs.
+* Wed Apr 05 2017 Patrick Creech - 2.1.4-3
+- use scl_prefix macro instead of scl_prefix_python for vine dep
 
-* Wed Feb 03 2016 Patrick Creech <pcreech@redhat.com> 1.4.9-1
-- Upgrade python-amqp dep to 1.4.9 (pcreech@redhat.com)
+* Wed Apr 05 2017 Patrick Creech - 2.1.4-2
+- Add vine runtime dep
 
-* Fri Dec 18 2015 Brian Bouterse <bbouters@redhat.com> 1.4.7-1
-- Upgrade python-amqp dep to 1.4.7 (sean.myers@redhat.com)
+* Wed Apr 05 2017 Patrick Creech - 2.1.4-1
+- new version
 
-* Fri Dec 18 2015 Sean Myers <sean.myers@redhat.com> 1.4.7-1
-- Upgrade python-amqp to 1.4.7 (sean.myers@redhat.com)
+* Thu Nov 17 2016 Patrick Creech <pcreech@redhat.com> - 1.4.9-2
+- Remove nose dependency
 
-* Tue Dec 09 2014 Brian Bouterse 1.4.6-1
-- Upgrade python-amqp to 1.4.6 (bbouters@redhat.com)
+* Wed Nov 09 2016 Patrick Creech <pcreech@redhat.com> - 1.4.9-1
+- Initial build
 
-* Mon Apr 21 2014 Randy Barlow <rbarlow@redhat.com> 1.4.5-1
-- Update to python-amqp-1.4.5. (rbarlow@redhat.com)
 
-* Wed Mar 05 2014 Randy Barlow <rbarlow@redhat.com> 1.4.4-1
-- Update to amqp-1.4.4. (rbarlow@redhat.com)
-- Remove a duplicate block from the changelog on amqp. (rbarlow@redhat.com)
-
-* Thu Feb 20 2014 Randy Barlow <rbarlow@redhat.com> 1.4.3-1
-- Raise python-amqp to 1.4.3. (rbarlow@redhat.com)
-- Merge pull request #787 from pulp/mhrivnak-deps (mhrivnak@hrivnak.org)
-- Deleting dependencies we no longer need and adding README files to explain
-  why we are keeping the others. (mhrivnak@redhat.com)
-- Remove a stray space from python-amqp.spec (rbarlow@redhat.com)
-- Don't build Python 3 versions of Celery and deps. (rbarlow@redhat.com)
-
-* Mon Jan 27 2014 Randy Barlow <rbarlow@redhat.com> 1.3.3-1
-- new package built with tito
-
-* Fri Nov 15 2013 Eric Harney <eharney@redhat.com> - 1.3.3-1
-- Update to 1.3.3
-
-* Fri Oct 25 2013 Eric Harney <eharney@redhat.com> - 1.3.1-1
-- Update to 1.3.1
-
-* Tue Oct 08 2013 Eric Harney <eharney@redhat.com> - 1.3.0-1
-- Update to 1.3.0
-
-* Fri Sep 20 2013 Eric Harney <eharney@redhat.com> - 1.2.1-1
-- Update to 1.2.1
-
-* Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 1.0.11-2
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
-
-* Fri Jun 21 2013 Eric Harney <eharney@redhat.com> - 1.0.11-1
-- Initial package
