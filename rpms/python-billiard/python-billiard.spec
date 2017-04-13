@@ -4,8 +4,8 @@
 %global srcname billiard
 
 Name:		%{?scl_prefix}python-billiard
-Version:	3.3.0.23
-Release:	2%{?dist}
+Version:	3.5.0.2
+Release:	1%{?dist}
 Summary:	Multiprocessing Pool Extensions
 
 License:	BSD
@@ -42,6 +42,9 @@ This package contains extensions to the multiprocessing Pool.
 
 
 %changelog
+* Wed Apr 05 2017 Patrick Creech - 3.5.0.2-1
+- new version
+
 * Thu Nov 17 2016 Patrick Creech <pcreech@redhat.com> - 3.3.0.23-2
 - rebuilt based on PR feedback
 
