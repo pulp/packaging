@@ -13,7 +13,7 @@ BuildRequires: python3-setuptools
 BuildRequires: python3-rpm-macros
 BuildRequires: python3-sphinx
 
-%global directories app common exceptions tasking
+%global directories platform common
 
 %description
 Pulp provides replication, access, and accounting for software repositories.
@@ -43,12 +43,12 @@ do
 done
 
 install -d %{buildroot}%{_sysconfdir}/default/
-cp app/etc/default/pulp_celerybeat %{buildroot}/%{_sysconfdir}/default/pulp_celerybeat
-cp app/etc/default/pulp_resource_manager %{buildroot}/%{_sysconfdir}/default/pulp_resource_manager
-cp app/etc/default/pulp_workers %{buildroot}/%{_sysconfdir}/default/pulp_workers
+cp platform/etc/default/pulp_celerybeat %{buildroot}/%{_sysconfdir}/default/pulp_celerybeat
+cp platform/etc/default/pulp_resource_manager %{buildroot}/%{_sysconfdir}/default/pulp_resource_manager
+cp platform/etc/default/pulp_workers %{buildroot}/%{_sysconfdir}/default/pulp_workers
 
 mkdir -p %{buildroot}/%{_usr}/lib/systemd/system/
-cp app/usr/lib/systemd/system/* %{buildroot}/%{_usr}/lib/systemd/system/
+cp platform/usr/lib/systemd/system/* %{buildroot}/%{_usr}/lib/systemd/system/
 
 
 # ---- Doc ------------------------------------------------------------------
@@ -87,10 +87,8 @@ Pulp provides replication, access, and accounting for software repositories.
 %config(noreplace) %{_sysconfdir}/default/pulp_celerybeat
 %config(noreplace) %{_sysconfdir}/default/pulp_resource_manager
 %config(noreplace) %{_sysconfdir}/default/pulp_workers
-%{python3_sitelib}/%{name}/app
-%{python3_sitelib}/pulp_app*.egg-info
-%{python3_sitelib}/%{name}/tasking
-%{python3_sitelib}/pulp_tasking*.egg-info
+%{python3_sitelib}/%{name}
+%{python3_sitelib}/pulp_platform*.egg-info
 
 %defattr(-,root,root,-)
 # list these explicitly (don't glob) to prevent pulling in extra service files
@@ -99,7 +97,7 @@ Pulp provides replication, access, and accounting for software repositories.
 %{_usr}/lib/systemd/system/pulp_resource_manager.service
 
 %post platform
-%systemd_post pulp_workers.service
+%systemd_post pulp_worker@.service
 %systemd_post pulp_celerybeat.service
 %systemd_post pulp_resource_manager.service
 
@@ -114,9 +112,7 @@ A collection of components that are common between the pulp server and client.
 
 %files -n python-pulp-common
 %{python3_sitelib}/%{name}/common
-%{python3_sitelib}/%{name}/exceptions
 %{python3_sitelib}/pulp_common*.egg-info
-%{python3_sitelib}/pulp_exception*.egg-info
 %{python3_sitelib}/%{name}/__init__.*
 %{python3_sitelib}/%{name}/__pycache__/*
 %doc README LICENSE COPYRIGHT
