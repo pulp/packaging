@@ -1,6 +1,12 @@
 Pulp Packaging
 ==============
 
+DEPRECATED
+----------
+This repo is being deprecated in favor of pulp-packaging.  Over the 2.15 cycle, relevant items
+will be moved over to pulp-packaging
+
+
 This repository contains code relevant to distributing Pulp through packaging formats. It currently
 supports distributing Pulp through RPMs and Docker images.
 
