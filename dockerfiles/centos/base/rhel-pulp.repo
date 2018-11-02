@@ -1,28 +1,64 @@
 # Place this file in your /etc/yum.repos.d/ directory
- 
-# Version 2.7 Production Releases
-[pulp-v2-stable]
-name=Pulp v2 Production Releases
-baseurl=http://repos.fedorapeople.org/repos/pulp/pulp/stable/2.7/7Server/$basearch/
+
+# Version 2.x Production Releases
+[pulp-2-stable]
+name=Pulp 2 Production Releases
+baseurl=https://repos.fedorapeople.org/repos/pulp/pulp/stable/2/$releasever/$basearch/
 enabled=1
-skip_if_unavailable=0
+skip_if_unavailable=1
 gpgcheck=1
 gpgkey=https://repos.fedorapeople.org/repos/pulp/pulp/GPG-RPM-KEY-pulp-2
 
-# Version 2.7 Beta Builds
-[pulp-v2-beta]
-name=Pulp v2 Beta Builds
-baseurl=http://repos.fedorapeople.org/repos/pulp/pulp/beta/2.7/7Server/$basearch/
-enabled=0
-skip_if_unavailable=0
-gpgcheck=1
-gpgkey=https://repos.fedorapeople.org/repos/pulp/pulp/GPG-RPM-KEY-pulp-2
-
-# Weekly Testing Builds
-[pulp-v2-testing]
-name=Pulp v2 Testing Builds
-baseurl=http://repos.fedorapeople.org/repos/pulp/pulp/testing/2.7/7Server/$basearch/
+# Latest Stable Release (disabled by default to prevent automatic major version upgrades)
+[pulp-stable]
+name=Pulp Production Releases
+baseurl=https://repos.fedorapeople.org/repos/pulp/pulp/stable/latest/$releasever/$basearch/
 enabled=0
 skip_if_unavailable=1
-gpgcheck=0
+gpgcheck=1
+gpgkey=https://repos.fedorapeople.org/repos/pulp/pulp/GPG-RPM-KEY-pulp-2
 
+# Version 2.17 Beta Builds
+[pulp-2.17-beta]
+name=Pulp 2.17 Beta Builds
+baseurl=https://repos.fedorapeople.org/repos/pulp/pulp/beta/2.17/$releasever/$basearch/
+enabled=0
+skip_if_unavailable=1
+gpgcheck=1
+gpgkey=https://repos.fedorapeople.org/repos/pulp/pulp/GPG-RPM-KEY-pulp-2
+
+# Version 2.16 Beta Builds
+[pulp-2.16-beta]
+name=Pulp 2.16 Beta Builds
+baseurl=https://repos.fedorapeople.org/repos/pulp/pulp/beta/2.16/$releasever/$basearch/
+enabled=0
+skip_if_unavailable=1
+gpgcheck=1
+gpgkey=https://repos.fedorapeople.org/repos/pulp/pulp/GPG-RPM-KEY-pulp-2
+
+# Version 2.15 Beta Builds
+[pulp-2.15-beta]
+name=Pulp 2.15 Beta Builds
+baseurl=https://repos.fedorapeople.org/repos/pulp/pulp/beta/2.15/$releasever/$basearch/
+enabled=0
+skip_if_unavailable=1
+gpgcheck=1
+gpgkey=https://repos.fedorapeople.org/repos/pulp/pulp/GPG-RPM-KEY-pulp-2
+
+# Version 2.14 Beta Builds
+[pulp-2.14-beta]
+name=Pulp 2.14 Beta Builds
+baseurl=https://repos.fedorapeople.org/repos/pulp/pulp/beta/2.14/$releasever/$basearch/
+enabled=0
+skip_if_unavailable=1
+gpgcheck=1
+gpgkey=https://repos.fedorapeople.org/repos/pulp/pulp/GPG-RPM-KEY-pulp-2
+
+# Version 2.13 Beta Builds
+[pulp-2.13-beta]
+name=Pulp 2.13 Beta Builds
+baseurl=https://repos.fedorapeople.org/repos/pulp/pulp/beta/2.13/$releasever/$basearch/
+enabled=0
+skip_if_unavailable=1
+gpgcheck=1
+gpgkey=https://repos.fedorapeople.org/repos/pulp/pulp/GPG-RPM-KEY-pulp-2
