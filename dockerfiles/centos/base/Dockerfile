@@ -8,6 +8,7 @@ RUN yum install -y epel-release && yum clean all
 RUN yum update -y && yum install -y python-qpid python-qpid-qmf pulp-docker-plugins \
     pulp-python-plugins findutils nmap-ncat qpid-tools && \
     yum groupinstall -y pulp-server-qpid && \
+    yum install -y pulp-deb-plugins python-pulp-deb-common pulp-deb-admin-extensions && \
     yum clean all
 
 # A volume will be mounted here, clobbering the base structure. We keep a copy
